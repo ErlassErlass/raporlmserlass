@@ -1,0 +1,357 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+:root {
+  --primary: #2C3E50;
+  --secondary: #0EA5E9;
+  --sangat-tinggi: #059669; 
+  --tinggi: #10B981; 
+  --cukup: #D97706; 
+  --kurang: #E11D48; 
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #F8FAFC;
+  color: #0F172A;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, 
+.navbar-brand, 
+.section-title, 
+.domain-title, 
+.kop-title, 
+.auth-card h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-mono, 
+#pdfSertifikat, 
+.mono-code {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 600;
+}
+
+header.glass-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 0;
+}
+
+.glass-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3rem;
+}
+
+/* Modal Wrapper */
+.modal-xl {
+  max-width: 950px; 
+}
+.modal-content {
+  background: #e2e8f0; 
+}
+
+/* --- A4 PAGES FOR PDF --- */
+.report-wrapper {
+  width: 210mm;
+}
+
+.a4-page {
+  width: 210mm;
+  min-height: 296mm; /* Menggunakan min-height agar tidak menabrak limit pixel A4 jsPDF */
+  background: #ffffff;
+  padding: 10mm 15mm; 
+  color: #1a1a1a;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin-bottom: 15px; 
+  display: flex;
+  flex-direction: column;
+}
+
+.html2pdf__page-break {
+  height: 0px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  page-break-before: always;
+  clear: both;
+}
+
+/* Report Header (Kop Surat) */
+.report-header.kop-surat {
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.report-header.kop-surat::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--primary);
+}
+
+.report-title-area h1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18.5pt;
+  font-weight: 800;
+  color: #1e3a8a;
+  letter-spacing: -0.5px;
+  margin: 0 0 2px 0;
+}
+.report-title-area p {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #475569;
+  font-size: 9.5pt;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Student Bio Box */
+.student-bio {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+}
+.bio-row { display: flex; font-size: 9pt; }
+.bio-label { 
+  font-family: 'Inter', sans-serif; 
+  font-weight: 600; 
+  width: 100px; 
+  color: #64748b; 
+}
+.bio-value { 
+  font-family: 'Plus Jakarta Sans', sans-serif; 
+  font-weight: 700; 
+  color: #0F172A; 
+  text-transform: uppercase; 
+}
+
+/* Charts */
+.domain-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10.5pt;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 5px;
+  letter-spacing: -0.2px;
+}
+.chart-box {
+  width: 100%;
+}
+
+/* Badges & Text */
+.score-badge {
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 8.5pt;
+  color: white;
+  display: inline-block;
+}
+.bg-sangat-tinggi { background-color: var(--sangat-tinggi); }
+.bg-tinggi { background-color: var(--tinggi); color: #fff; }
+.bg-cukup { background-color: var(--cukup); color: #fff; }
+.bg-kurang { background-color: var(--kurang); }
+
+.text-interpretation {
+  font-size: 9.5pt;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.top-3-container {
+  font-size: 9.5pt;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.top-3-item {
+  border-bottom: 1px dashed #cbd5e1;
+  padding: 2px 0;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+
+.signature-section {
+  font-size: 9.5pt;
+}
+
+.report-footer {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+  font-size: 7.5pt;
+  color: #94a3b8;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Sembunyikan margin web saat capture PDF agar tidak ada blank spill-over */
+.report-wrapper.printing {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: white !important;
+}
+.report-wrapper.printing .a4-page {
+  width: 210mm !important;
+  height: 296.5mm !important; /* Membatasi tinggi agar tidak tumpah/spillover membuat halaman kosong */
+  max-height: 296.5mm !important;
+  min-height: 296.5mm !important; 
+  box-shadow: none !important;
+  margin: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+  page-break-inside: avoid !important;
+}
+
+@media print {
+  .a4-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+}
+
+/* --- PASSCODE AUTH GATE (RESTRICTED ACCESS) --- */
+.auth-gate-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: radial-gradient(ellipse at 50% 15%, #1e293b 0%, #0a0f1d 75%, #050811 100%) !important;
+  padding: 1.5rem !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 99999 !important;
+  box-sizing: border-box !important;
+}
+
+.auth-card {
+  background: rgba(17, 24, 39, 0.9) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 24px !important;
+  padding: 38px 32px 30px !important;
+  max-width: 440px !important;
+  width: 100% !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(37, 99, 235, 0.15) !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+
+.brand-logo-pill {
+  background: #ffffff !important;
+  padding: 8px 22px !important;
+  border-radius: 14px !important;
+  display: inline-block !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+  margin-bottom: 18px !important;
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.auth-input-wrapper {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.auth-input {
+  width: 100% !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  color: #f8fafc !important;
+  border-radius: 14px !important;
+  padding: 13px 44px 13px 42px !important;
+  font-size: 15px !important;
+  letter-spacing: 2px !important;
+  transition: all 0.25s ease !important;
+  box-sizing: border-box !important;
+}
+
+.auth-input:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25), 0 0 20px rgba(56, 189, 248, 0.15) !important;
+  outline: none !important;
+}
+
+.auth-input::placeholder {
+  color: #64748b !important;
+  letter-spacing: normal !important;
+  font-size: 14px !important;
+}
+
+.auth-submit-btn {
+  width: 100% !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 14px 20px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+.auth-submit-btn:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.6) !important;
+}
+
+.auth-submit-btn:active {
+  transform: translateY(0) !important;
+}
+
+@keyframes shakeCard {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-10px); }
+  40%, 80% { transform: translateX(10px); }
+}
+
+.auth-card.shake {
+  animation: shakeCard 0.4s ease-in-out !important;
+}
+

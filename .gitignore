@@ -1,0 +1,8 @@
+# Server Local Configurations (Credentials)
+config.local.php
+*.local.php
+.env
+
+# OS Files
+.DS_Store
+Thumbs.db

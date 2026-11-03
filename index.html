@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erlass Assessment Dashboard &bull; Portal Hasil TPA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="css/vendor/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/vendor/all.min.css">
+  <link rel="stylesheet" href="css/style.css?v=3.3.0">
+  <style>
+    .auth-gate-container {
+      min-height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 15%, #1e293b 0%, #0a0f1d 75%, #050811 100%);
+      padding: 1.5rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 99999;
+      box-sizing: border-box;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    #authGate.d-none, .auth-gate-container.d-none {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .auth-card {
+      background: rgba(17, 24, 39, 0.9) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 24px !important;
+      padding: 38px 32px 30px !important;
+      max-width: 440px !important;
+      width: 100% !important;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(37, 99, 235, 0.15) !important;
+      text-align: center !important;
+      box-sizing: border-box !important;
+      margin: 0 auto !important;
+    }
+
+    .brand-logo-pill {
+      background: #ffffff !important;
+      padding: 8px 22px !important;
+      border-radius: 14px !important;
+      display: inline-block !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+      margin-bottom: 18px !important;
+    }
+
+    .pulse-indicator {
+      width: 8px;
+      height: 8px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      animation: pulseRed 2s infinite;
+    }
+
+    @keyframes pulseRed {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .auth-input-wrapper {
+      position: relative !important;
+      width: 100% !important;
+    }
+
+    .auth-input {
+      width: 100% !important;
+      background: rgba(15, 23, 42, 0.85) !important;
+      border: 1px solid rgba(148, 163, 184, 0.25) !important;
+      color: #f8fafc !important;
+      border-radius: 14px !important;
+      padding: 13px 44px 13px 42px !important;
+      font-size: 15px !important;
+      letter-spacing: 2px !important;
+      transition: all 0.25s ease !important;
+      box-sizing: border-box !important;
+    }
+
+    .auth-input:focus {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25), 0 0 20px rgba(56, 189, 248, 0.15) !important;
+      outline: none !important;
+    }
+
+    .auth-input::placeholder {
+      color: #64748b !important;
+      letter-spacing: normal !important;
+      font-size: 14px !important;
+    }
+
+    .auth-submit-btn {
+      width: 100% !important;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 14px !important;
+      padding: 14px 20px !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.3px !important;
+      cursor: pointer !important;
+      transition: all 0.25s ease !important;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+    }
+
+    .auth-submit-btn:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.6) !important;
+    }
+
+    .auth-submit-btn:active {
+      transform: translateY(0) !important;
+    }
+
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    .auth-card.shake {
+      animation: shakeCard 0.4s ease-in-out !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Passcode Access Gate (Restricted Access) -->
+  <div id="authGate" class="auth-gate-container">
+    <div class="auth-card">
+      
+      <!-- Brand Logo -->
+      <div class="brand-logo-pill">
+        <img src="img/logo_erlass.png" alt="Erlass Academy" style="height: 44px; width: auto; object-fit: contain;">
+      </div>
+
+      <!-- Header Titles -->
+      <h3 style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 4px; letter-spacing: -0.3px;">
+        Assessment &amp; Reporting Portal
+      </h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 14px; line-height: 1.4;">
+        Sistem Rekapitulasi &amp; Pelaporan Hasil TPA, Minat, dan Karakter
+      </p>
+
+      <!-- Security Status Badge -->
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); padding: 5px 14px; border-radius: 9999px; margin-bottom: 24px;">
+        <span class="pulse-indicator"></span>
+        <span style="font-size: 11px; font-weight: 600; color: #fca5a5; letter-spacing: 0.5px; text-transform: uppercase;">
+          Akses Terproteksi
+        </span>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="authForm" onsubmit="handlePasscodeSubmit(event)">
+        <div style="text-align: left; margin-bottom: 18px;">
+          <label for="passcodeInput" style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+            Passcode Akses
+          </label>
+          <div class="auth-input-wrapper">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px; pointer-events: none;">
+              <i class="fas fa-key"></i>
+            </span>
+            <input type="password" id="passcodeInput" class="auth-input" placeholder="Masukkan Passcode Akses" required autocomplete="current-password" autofocus>
+            <button type="button" onclick="togglePasscodeVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px 8px; font-size: 14px;">
+              <i class="fas fa-eye" id="togglePasscodeIcon"></i>
+            </button>
+          </div>
+          <div id="authErrorMsg" class="d-none" style="margin-top: 10px; font-size: 12px; color: #f87171; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); padding: 8px 12px; border-radius: 10px;">
+            <i class="fas fa-exclamation-circle me-1"></i> Passcode salah. Silakan coba lagi.
+          </div>
+        </div>
+
+        <button type="submit" id="btnAuthSubmit" class="auth-submit-btn">
+          <i class="fas fa-lock-open me-2"></i> Buka Akses Dasbor
+        </button>
+      </form>
+
+      <!-- Footer Info -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; color: #64748b; display: flex; justify-content: space-between; align-items: center;">
+        <span><i class="fas fa-shield-alt text-primary me-1"></i> 256-bit Encrypted</span>
+        <span>&copy; 2026 Erlass Academy</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main Application (Hidden until authenticated) -->
+  <div id="mainApp" style="display: none;">
+
+    <!-- Header Web -->
+    <header class="glass-header mb-4">
+      <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="navbar-brand fs-4 mb-0">
+          <i class="fas fa-brain me-2 text-primary"></i> Erlass Analytics Portal
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <!-- Course Asesmen Selector Dropdown -->
+          <div class="d-flex align-items-center gap-2 bg-white rounded-pill px-3 py-1 shadow-sm border" title="Pilih Course Asesmen">
+            <i class="fas fa-graduation-cap text-primary"></i>
+            <label for="courseSelect" class="visually-hidden">Course Asesmen</label>
+            <select id="courseSelect" class="form-select form-select-sm border-0 bg-transparent fw-bold text-dark" style="width: auto; min-width: 260px; cursor: pointer;" onchange="handleCourseChange(this.value)">
+              <option value="63">Profil Potensi &amp; Karakter SD Kelas 4–6</option>
+              <option value="48">Profil Potensi &amp; Karakter SD Kelas 1–3</option>
+              <option value="50">Profil Potensi &amp; Karakter SMP</option>
+              <option value="51">Profil Potensi &amp; Karakter SMA</option>
+              <option value="46">Profil Tumbuh &amp; Karakter Peserta Didik (TK)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-sm btn-outline-secondary" onclick="fetchFromAPI()" title="Perbarui Data Course">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-primary" id="btnBulkPrint" disabled onclick="printBulkReport()">
+            <i class="fas fa-layer-group me-1"></i> Cetak PDF Massal (ZIP)
+          </button>
+          <button class="btn btn-sm btn-outline-danger" onclick="lockDashboard()" title="Kunci Dasbor">
+            <i class="fas fa-lock me-1"></i> Kunci
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="text-center mb-4">
+        <h2 class="fw-bold mb-2">Rekapitulasi Asesmen Peserta</h2>
+        <p class="text-muted">Pilih peserta untuk mensimulasikan hasil Rapor Premium (PDF format) yang siap jual.</p>
+
+        <!-- Upload JSON fallback -->
+        <div class="d-inline-flex align-items-center bg-white border border-light shadow-sm rounded-pill p-1 mb-3">
+          <label for="jsonUpload" class="btn btn-sm btn-outline-primary rounded-pill mb-0 me-2 px-3">
+            <i class="fas fa-upload me-1"></i> Unggah JSON Manual
+          </label>
+          <input type="file" id="jsonUpload" accept=".json" class="d-none">
+          <span class="text-muted small px-3" id="uploadStatus">Menyiapkan engine offline...</span>
+        </div>
+      </div>
+
+      <!-- Data Table Card -->
+      <div class="glass-card table-responsive p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th scope="col" class="ps-4">No</th>
+              <th scope="col">Nama Peserta</th>
+              <th scope="col">Email / ID</th>
+              <th scope="col">Status Tes</th>
+              <th scope="col" class="text-end pe-4">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <tr>
+              <td colspan="5" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+  </div> <!-- End #mainApp -->
+
+  <!-- Modal Preview PDF -->
+  <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+
+        <div class="modal-header bg-white border-0 pb-0">
+          <h5 class="modal-title text-muted"><i class="fas fa-search me-2"></i> Preview Format Rapor PDF (3 Halaman)
+          </h5>
+          <div>
+            <button type="button" class="btn btn-primary" onclick="printReport()">
+              <i class="fas fa-download me-1"></i> Unduh Laporan (.PDF)
+            </button>
+            <button type="button" class="btn-close ms-3" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+
+        <div class="modal-body p-4 bg-light d-flex flex-column align-items-center" id="reportWrapper">
+
+          <!-- --- EXACT A4 PRINTABLE CONTAINER --- -->
+          <div id="printTemplate" class="report-wrapper">
+
+            <!-- HALAMAN 1: VISUALISASI CHART -->
+            <div class="a4-page page-1">
+
+              <!-- Kop Surat Terpusat (Logos -> Office -> Title) -->
+              <div class="text-center mb-2 pb-1" style="border-bottom: 2px dotted #64748B;">
+
+                <!-- Baris 1: Kombinasi Logo -->
+                <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
+                  <img src="img/logo_erlass.png" height="42" alt="Erlass Logo" style="object-fit: contain;">
+                  <img src="img/logoerlassacademy.png" height="42" alt="Erlass Academy Logo" style="object-fit: contain;">
+                  <img src="img/logo_coding.png" height="34" alt="Coding Erlass Logo" style="object-fit: contain;">
+                </div>
+
+                <!-- Baris 2: Informasi Kantor -->
+                <div class="kop-text mb-2"
+                  style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8pt; color: #1e293b; line-height: 1.25;">
+                  <div style="font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 600;">Office</div>
+                  <div style="font-size: 9pt; font-weight: 700; color: #0f172a;">Erlass Institute Pejaten Office Park Blok D</div>
+                  <div style="color: #334155;">Jl. Warung Buncit Raya No. 79, Pejaten, Pasar Minggu, Jakarta Selatan, INDONESIA</div>
+
+                  <div class="d-flex justify-content-center mt-1" style="gap: 15px; color: #475569; font-size: 7.5pt;">
+                    <div>T +62 (21) 7918 0467 &nbsp;|&nbsp; F +62 (21) 7919 5157</div>
+                    <div>E erlassproindonesia@gmail.com &nbsp;|&nbsp; W www.erlass.co.id / galeribelajar.com / erlass.academy</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Baris 3: Judul Laporan -->
+              <div class="report-title-area text-center mb-3 mt-1">
+                <h1 style="color: #1e3a8a; font-size: 18pt; margin-bottom: 2px;">Psychological Profile Report</h1>
+                <p style="font-size: 9pt;">Laporan Potensi, Minat, dan Bakat Peserta Didik</p>
+              </div>
+
+              <!-- Bio -->
+              <div class="student-bio">
+                <div class="bio-row"><span class="bio-label">No. Sertifikat</span><span class="bio-value font-mono"
+                    id="pdfSertifikat" style="color: var(--primary); font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: -0.3px;">-</span></div>
+                <div class="bio-row"><span class="bio-label">Tanggal Cetak</span><span class="bio-value"
+                    id="pdfTanggal">-</span></div>
+                <div class="bio-row"><span class="bio-label">Nama</span><span class="bio-value" id="pdfNama">-</span>
+                </div>
+                <div class="bio-row"><span class="bio-label">Program Tes</span><span class="bio-value"
+                    id="pdfProgramTes">POTENSI , MINAT, DAN BAKAT SD KELAS 4-6</span></div>
+                <div class="bio-row"><span class="bio-label">Email / ID</span><span class="bio-value"
+                    id="pdfEmail">-</span></div>
+              </div>
+
+              <div class="report-body">
+
+                <!-- Kombinasi RADAR: IQ & Bakat -->
+                <div class="row g-4 mb-4">
+                  <div class="col-6">
+                    <h6 class="domain-title text-center text-primary border-bottom pb-2">Profil Kemampuan Belajar</h6>
+                    <div class="chart-box" style="height: 320px;">
+                      <canvas id="iqRadarChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <h6 class="domain-title text-center text-primary border-bottom pb-2">Pemetaan Bakat (Aptitude)</h6>
+                    <div class="chart-box" style="height: 320px;">
+                      <canvas id="bakatRadarChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Grafik Minat (Dimensi Lebar) -->
+                <div class="row mt-4">
+                  <div class="col-12">
+                    <h6 class="domain-title text-center text-primary border-bottom pb-2">Pemetaan Pola Minat Utama</h6>
+                    <div class="chart-box mt-3" style="height: 290px;">
+                      <canvas id="minatBarChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="report-footer mt-auto">
+                <span>Di-generate oleh Erlass Assessment System</span>
+                <span>Halaman 1 / 3</span>
+              </div>
+            </div> <!-- Page 1 End -->
+
+            <!-- HALAMAN 2: EQ, SQ & INTERPRETASI DASAR -->
+            <div class="html2pdf__page-break"></div>
+            <div class="a4-page page-2">
+
+              <!-- Kop Surat Mini -->
+              <div class="report-header kop-surat d-flex justify-content-between align-items-center mb-4 pb-2"
+                style="border-bottom: 2px dotted #64748B;">
+                <div class="logo-left">
+                  <img src="img/logo_erlass.png" height="32" alt="Erlass Logo" style="object-fit: contain;">
+                </div>
+                <div class="kop-text text-center flex-grow-1 px-3">
+                  <div class="fw-bold" style="font-size: 11pt; color: #1e3a8a;">Erlass Academy</div>
+                  <div style="font-size: 8pt; color: #475569;">Ekspansi Grafis & Diagnostik Kognitif (Halaman 2 / 3)</div>
+                </div>
+                <div class="logo-right text-end">
+                  <img src="img/logoerlassacademy.png" height="30" alt="Erlass Academy Logo" style="object-fit: contain;">
+                </div>
+              </div>
+
+              <!-- Bar Ekstra: EQ & SQ -->
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <h6 class="domain-title text-center text-primary border-bottom pb-1" style="font-size: 10.5pt;">
+                    Peta Pengembangan Diri</h6>
+                  <div class="chart-box mt-2" style="height: 185px;">
+                    <canvas id="eqBarChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <h6 class="domain-title text-center text-primary border-bottom pb-1" style="font-size: 10.5pt;">
+                    Pemetaan Kesadaran Diri &amp; Relasi</h6>
+                  <div class="chart-box mt-2" style="height: 185px;">
+                    <canvas id="sqBarChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center mb-3">
+                <h3 class="section-title mb-0 d-inline-block pb-1" style="border-bottom: 2px solid #1e3a8a; font-size: 12.5pt;">Analisis
+                  Pendalaman Kognitif &amp; Karakter</h3>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="interpretation-card mb-2" id="pdfIqCard">
+                    <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
+                      <h6 class="domain-title text-primary mb-0" style="font-size: 10pt;"><i class="fas fa-brain me-2"></i> Profil Kemampuan Belajar</h6>
+                      <div class="d-flex align-items-center gap-1">
+                        <div id="pdfIqBadge" class="score-badge bg-sangat-tinggi mb-0">-</div>
+                        <div id="pdfIqNormBadge" class="badge bg-light text-primary border" style="font-size: 7.5pt; display: none;">-</div>
+                      </div>
+                    </div>
+                    <div id="pdfIqText" class="text-interpretation text-justify" style="font-size: 8.8pt; line-height: 1.45;"></div>
+                    <div id="pdfIqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 8pt;"></div>
+                  </div>
+
+                  <div class="interpretation-card mb-2" id="pdfEqCard">
+                    <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
+                      <h6 class="domain-title text-primary mb-0" style="font-size: 10pt;"><i class="fas fa-heart me-2"></i> Peta Pengembangan Diri (EQ)</h6>
+                      <div id="pdfEqBadge" class="score-badge bg-tinggi mb-0">-</div>
+                    </div>
+                    <div id="pdfEqText" class="text-interpretation text-justify" style="font-size: 8.8pt; line-height: 1.45;"></div>
+                    <div id="pdfEqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 8pt;"></div>
+                  </div>
+
+                  <div class="interpretation-card mb-2" id="pdfSqCard">
+                    <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
+                      <h6 class="domain-title text-primary mb-0" style="font-size: 10pt;"><i class="fas fa-dove me-2"></i> Pemetaan Kesadaran Diri &amp; Relasi (SQ)</h6>
+                      <div id="pdfSqBadge" class="score-badge bg-cukup mb-0">-</div>
+                    </div>
+                    <div id="pdfSqText" class="text-interpretation text-justify" style="font-size: 8.8pt; line-height: 1.45;"></div>
+                    <div id="pdfSqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 8pt;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report-footer mt-auto">
+                <span>Dokumen Otentik - Bersifat Rahasia (Confidential)</span>
+                <span>Halaman 2 / 3</span>
+              </div>
+            </div> <!-- Page 2 End -->
+
+            <!-- HALAMAN 3: SPESIFIKASI BAKAT & TTD -->
+            <div class="html2pdf__page-break"></div>
+            <div class="a4-page page-3">
+
+              <!-- Kop Surat Mini -->
+              <div class="report-header kop-surat d-flex justify-content-between align-items-center mb-4 pb-2"
+                style="border-bottom: 2px dotted #64748B;">
+                <div class="logo-left">
+                  <img src="img/logo_erlass.png" height="32" alt="Erlass Logo" style="object-fit: contain;">
+                </div>
+                <div class="kop-text text-center flex-grow-1 px-3">
+                  <div class="fw-bold" style="font-size: 11pt; color: #1e3a8a;">Erlass Academy</div>
+                  <div style="font-size: 8pt; color: #475569;">Konklusi Khusus &amp; Pengesahan (Halaman 3 / 3)</div>
+                </div>
+                <div class="logo-right text-end">
+                  <img src="img/logoerlassacademy.png" height="30" alt="Erlass Academy Logo" style="object-fit: contain;">
+                </div>
+              </div>
+
+              <div class="row g-4 mt-1">
+                <!-- Kolom Peringkat -->
+                <div class="col-6">
+                  <div class="interpretation-card mb-3 border rounded p-3 bg-light">
+                    <h6 class="domain-title text-primary border-bottom pb-2"><i
+                        class="fas fa-star text-warning me-2"></i> Tiga Minat Tertinggi</h6>
+                    <div id="minatTop3List" class="top-3-container ps-2 mt-2" style="font-size: 10pt;"></div>
+                  </div>
+
+                  <div class="interpretation-card mb-3 border rounded p-3 bg-light">
+                    <h6 class="domain-title text-primary border-bottom pb-2"><i class="fas fa-gem text-danger me-2"></i>
+                      Tiga Bakat Paling Dominan</h6>
+                    <div id="bakatTop3List" class="top-3-container ps-2 mt-2" style="font-size: 10pt;"></div>
+                  </div>
+                </div>
+
+                <!-- Kolom Matriks -->
+                <div class="col-6">
+                  <div class="interpretation-card mb-3 rounded border border-info px-3 py-3"
+                    style="background-color: #f0fdfa;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="domain-title mb-0" style="color: #0f766e; font-size: 10pt;"><i class="fas fa-lightbulb me-2"></i> Sinergi Minat &amp; Potensi</h6>
+                      <span id="pdfJenjangBadge" class="badge bg-secondary" style="font-size: 7.5pt;">SD Kelas 4–6</span>
+                    </div>
+                    <div class="mb-2" id="pdfProfilPotensiWrapper" style="display: none;">
+                      <span class="badge" style="background-color: #0d9488; font-size: 8.5pt;" id="pdfProfilPotensiBadge">Profil Potensi</span>
+                    </div>
+                    <div id="pdfKombinasiText" class="text-interpretation text-justify"
+                      style="font-size: 8.8pt; line-height: 1.5;">
+                      Sedang menganalisis matriks silang antar variabel...
+                    </div>
+                    <div id="pdfMinatPotensiRekWrapper" class="mt-2 pt-2 border-top border-info-subtle" style="display: none;">
+                      <div class="fw-bold mb-1" style="font-size: 8.5pt; color: #0f766e;"><i class="fas fa-compass me-1"></i> Rekomendasi Aktivitas &amp; Stimulasi:</div>
+                      <ul id="pdfMinatPotensiRekList" class="ps-3 mb-0" style="font-size: 8.2pt; line-height: 1.45; color: #334155;"></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Signature Area -->
+              <div class="signature-section mt-5 pt-4">
+                <div class="row">
+                  <div class="col-7"></div>
+                  <div class="col-5 text-center">
+                    <p class="mb-1"><strong>Jakarta, <span id="sigTanggal"></span></strong></p>
+                    <p class="mb-5 text-muted">Tim Psikolog<br>Erlass Prokreatif Indonesia</p>
+                    <!-- TTD Placeholder Line -->
+                    <div style="border-bottom: 1px solid black; width: 80%; margin: 60px auto 5px;"></div>
+                    <p class="mb-0 fw-bold">Penanggung Jawab Asesmen</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report-footer mt-auto">
+                <span>Dokumen Otentik - Bersifat Rahasia (Confidential)</span>
+                <span>Halaman 3 / 3</span>
+              </div>
+
+            </div> <!-- Page 3 End -->
+
+          </div>
+          <!-- --- END EXACT A4 CONTAINER --- -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Progress Bulk Print -->
+  <div class="modal fade" id="bulkProgressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-white border-0 pb-0 shadow-sm justify-content-center">
+          <h5 class="modal-title text-primary"><i class="fas fa-spinner fa-spin me-2"></i> Membuat Rapor Massal</h5>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <p class="mb-2 text-muted fw-bold" id="bulkProgressText">Menyiapkan engine...</p>
+          <div class="progress mb-3" style="height: 22px; border-radius: 10px;">
+            <div id="bulkProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+              role="progressbar" style="width: 0%;">0%</div>
+          </div>
+          <p class="small text-danger mb-0"><i class="fas fa-exclamation-triangle"></i> Dimohon tidak keluar/tutup tab
+            ini hingga ZIP terunduh.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/vendor/bootstrap.bundle.min.js"></script>
+  <script src="js/vendor/chart.js"></script>
+  <script src="js/vendor/chartjs-plugin-datalabels.min.js"></script>
+  <script src="js/vendor/html2pdf.bundle.min.js"></script>
+  <script src="js/vendor/jszip.min.js"></script>
+  <script src="js/vendor/pdf-encrypt-lite.bundle.js"></script>
+
+  <script src="js/data-mapping.js?v=3.2.0"></script>
+  <script src="js/erlass-interpretation-engine-v2.js?v=3.2.0"></script>
+  <script src="js/engine.js?v=3.2.0"></script>
+  <script src="js/ui.js?v=3.2.0"></script>
+
+</body>
+
+</html>
