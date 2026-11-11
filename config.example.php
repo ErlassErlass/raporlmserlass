@@ -13,3 +13,4 @@ return [
     'valid_tokens' => ['TOKEN_HERE'],
     'token' => 'TOKEN_HERE'
 ];
+

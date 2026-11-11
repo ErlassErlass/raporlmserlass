@@ -906,23 +906,41 @@ function updateStudentReportFull(student, uiHelpers = {}) {
   const jenjang = detectJenjang(student.program);
 
   // 1. Minat & Potensi Adapter
-  // Jika student memiliki subtopics Minat / Bakat / Potensi
   let minatPotensiResult = null;
-  if (student.subtopics && (student.subtopics['Minat'] || student.subtopics['Bakat'])) {
-    const minatScores = student.subtopics['Minat'] || [];
-    const bakatScores = student.subtopics['Bakat'] || [];
+  const minatItems = student.subtopics?.['Minat'] || [];
+  const bakatItems = student.subtopics?.['Bakat'] || [];
+  const attemptedMinat = minatItems.filter(x => x.attempted);
+  const attemptedBakat = bakatItems.filter(x => x.attempted);
 
-    const avgMinatPref = minatScores.length > 0 ? (minatScores[0].nilai ?? 70) : 70;
-    const avgMinatDepth = minatScores.length > 1 ? (minatScores[1].nilai ?? 65) : 65;
+  // Hanya susun narasi jika siswa benar-benar telah mengikuti asesmen Minat / Bakat
+  if (attemptedMinat.length > 0 || attemptedBakat.length > 0) {
+    const prefItem = attemptedMinat.find(m => /PREFERENSI/i.test(m.label) || /preferensi/i.test(m.key));
+    const depthItem = attemptedMinat.find(m => /KEDALAMAN/i.test(m.label) || /kedalaman/i.test(m.key));
 
-    const potC = bakatScores.find(b => /LOGIKA|NUMERIK|KOGNITIF/i.test(b.label))?.nilai ?? 70;
-    const potD = bakatScores.find(b => /SENI|VISUAL|KREATIF|MUSIK/i.test(b.label))?.nilai ?? 65;
-    const potE = bakatScores.find(b => /PRAKTIS|MOTORIK|OLAHRAGA/i.test(b.label))?.nilai ?? 60;
-    const potF = bakatScores.find(b => /SOSIAL|KOMUNIKASI|PEMIMPIN/i.test(b.label))?.nilai ?? 65;
+    let avgMinatPref = prefItem ? prefItem.nilai : null;
+    let avgMinatDepth = depthItem ? depthItem.nilai : null;
+
+    if (avgMinatPref === null && attemptedMinat.length > 0) {
+      const sorted = [...attemptedMinat].sort((a, b) => b.nilai - a.nilai);
+      avgMinatPref = sorted[0].nilai;
+      avgMinatDepth = sorted.length > 1 ? (sorted[0].nilai + sorted[1].nilai) / 2 : sorted[0].nilai;
+    }
+
+    const allAptitude = [...attemptedBakat, ...attemptedMinat];
+    const findScore = (regex, fallback) => {
+      const match = allAptitude.find(b => regex.test(b.label) || regex.test(b.key));
+      return match ? match.nilai : fallback;
+    };
+
+    const defaultScore = avgMinatPref ?? 55;
+    const potC = findScore(/KOGNITIF|LOGIKA|NUMERIK|PENALARAN/i, defaultScore);
+    const potD = findScore(/KREATIF|SENI|VISUAL|MUSIK/i, defaultScore);
+    const potE = findScore(/MOTORIK|PRAKTIS|OLAHRAGA/i, defaultScore);
+    const potF = findScore(/SOSIAL|KOMUNIKASI|PEMIMPIN/i, defaultScore);
 
     minatPotensiResult = generateMinatPotensiReport({
-      A: avgMinatPref,
-      B: avgMinatDepth,
+      A: avgMinatPref ?? defaultScore,
+      B: avgMinatDepth ?? defaultScore,
       C: potC,
       D: potD,
       E: potE,
@@ -932,36 +950,52 @@ function updateStudentReportFull(student, uiHelpers = {}) {
 
   // 2. EQ Adapter
   let eqResult = null;
-  if (student.subtopics && student.subtopics['EQ']) {
-    const eqItems = student.subtopics['EQ'];
-    const sA = eqItems.find(it => /KESADARAN/i.test(it.label))?.nilai ?? 70;
-    const sB = eqItems.find(it => /REGULASI|PENGENDALIAN/i.test(it.label))?.nilai ?? 65;
-    const sC = eqItems.find(it => /EMPATI/i.test(it.label))?.nilai ?? 75;
-    const sD = eqItems.find(it => /RELASI|INTEGRITAS|HUBUNGAN/i.test(it.label))?.nilai ?? 70;
+  const eqItems = student.subtopics?.['EQ'] || [];
+  const attemptedEQ = eqItems.filter(x => x.attempted);
+  if (attemptedEQ.length > 0) {
+    const sA = attemptedEQ.find(it => /KESADARAN/i.test(it.label))?.nilai;
+    const sB = attemptedEQ.find(it => /REGULASI|PENGENDALIAN|PENGELOLAAN/i.test(it.label))?.nilai;
+    const sC = attemptedEQ.find(it => /EMPATI|SOSIAL/i.test(it.label))?.nilai;
+    const sD = attemptedEQ.find(it => /RELASI|INTEGRITAS|HUBUNGAN|KEPUTUSAN/i.test(it.label))?.nilai;
 
-    eqResult = generateEQReport({ A: sA, B: sB, C: sC, D: sD }, jenjang);
+    const eqAvg = attemptedEQ.reduce((acc, it) => acc + it.nilai, 0) / attemptedEQ.length;
+    eqResult = generateEQReport({
+      A: sA ?? eqAvg,
+      B: sB ?? eqAvg,
+      C: sC ?? eqAvg,
+      D: sD ?? eqAvg
+    }, jenjang);
   }
 
   // 3. SQ Adapter
   let sqResult = null;
-  if (student.subtopics && student.subtopics['SQ']) {
-    const sqItems = student.subtopics['SQ'];
-    const sA = sqItems.find(it => /NILAI/i.test(it.label))?.nilai ?? 75;
-    const sB = sqItems.find(it => /TUJUAN|NIAT/i.test(it.label))?.nilai ?? 70;
-    const sC = sqItems.find(it => /REFLEKSI|KESADARAN/i.test(it.label))?.nilai ?? 65;
-    const sD = sqItems.find(it => /PEDULI|TANGGUNG/i.test(it.label))?.nilai ?? 70;
+  const sqItems = student.subtopics?.['SQ'] || [];
+  const attemptedSQ = sqItems.filter(x => x.attempted);
+  if (attemptedSQ.length > 0) {
+    const sA = attemptedSQ.find(it => /NILAI|INTEGRITAS/i.test(it.label))?.nilai;
+    const sB = attemptedSQ.find(it => /TUJUAN|NIAT/i.test(it.label))?.nilai;
+    const sC = attemptedSQ.find(it => /REFLEKSI|KESADARAN/i.test(it.label))?.nilai;
+    const sD = attemptedSQ.find(it => /PEDULI|TANGGUNG|HUBUNGAN/i.test(it.label))?.nilai;
 
-    sqResult = generateSQReport({ A: sA, B: sB, C: sC, D: sD }, jenjang);
+    const sqAvg = attemptedSQ.reduce((acc, it) => acc + it.nilai, 0) / attemptedSQ.length;
+    sqResult = generateSQReport({
+      A: sA ?? sqAvg,
+      B: sB ?? sqAvg,
+      C: sC ?? sqAvg,
+      D: sD ?? sqAvg
+    }, jenjang);
   }
 
   // 4. Kognitif Adapter
   let kognitifResult = null;
-  if (student.subtopics && student.subtopics['IQ']) {
-    const iqItems = student.subtopics['IQ'];
-    const avg = iqItems.reduce((acc, it) => acc + it.nilai, 0) / (iqItems.length || 1);
-    // Standard score scaled approx (Fase I developmental)
+  const iqItems = student.subtopics?.['IQ'] || [];
+  const attemptedIQ = iqItems.filter(x => x.attempted);
+  if (attemptedIQ.length > 0) {
+    // Hitung rerata hanya dari subtes yang telah dikerjakan
+    const avg = attemptedIQ.reduce((acc, it) => acc + it.nilai, 0) / attemptedIQ.length;
+    // Standard score scaled approx (Fase I developmental, Mean 100, SD 15)
     const devIndex = 100 + ((avg - 50) / 10) * 5;
-    kognitifResult = generateKognitifReport(iqItems, devIndex, jenjang);
+    kognitifResult = generateKognitifReport(attemptedIQ, devIndex, jenjang);
   }
 
   return {

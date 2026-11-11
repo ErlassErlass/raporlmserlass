@@ -1,24 +1,30 @@
-// KUIS_MAPPING — Keywords disesuaikan dengan nama kuis aktual di Moodle Course 63 (SD Kelas 4-6)
+// KUIS_MAPPING — Keywords diselaraskan untuk seluruh jenjang: SD 1–3, SD 4–6, SMP, SMA/SMK
 const KUIS_MAPPING = [
   // MODUL A: Kemampuan Kognitif (IQ) - 6 Subtes
-  { key: 'IQ.nonVerbal',       modul: 'IQ',    label: 'Penalaran Non Verbal',    keywords: ['PKB A', 'NON VERBAL'] },
-  { key: 'IQ.verbal',          modul: 'IQ',    label: 'Penalaran Verbal',        keywords: ['PKB B', 'PENALARAN VERBAL'] },
-  { key: 'IQ.numerik',         modul: 'IQ',    label: 'Kemampuan Numerik',       keywords: ['PKB C', 'KEMAMPUAN NUMERIK'] },
-  { key: 'IQ.spasial',         modul: 'IQ',    label: 'Penalaran Spasial',       keywords: ['PKB D', 'PENALARAN SPASIAL'] },
-  { key: 'IQ.workingMemory',   modul: 'IQ',    label: 'Memori Kerja',            keywords: ['PKB E', 'MEMORI KERJA'] },
-  { key: 'IQ.processingSpeed', modul: 'IQ',    label: 'Kecepatan Pemrosesan',    keywords: ['PKB F', 'PEMROSESAN'] },
+  { key: 'IQ.nonVerbal',       modul: 'IQ',    label: 'Penalaran Non Verbal',    keywords: ['PKB A', 'NON VERBAL', 'NON-VERBAL', 'PENALARAN ABSTRAK', 'ABSTRAK', 'QUIZ-IQ_SD13'] },
+  { key: 'IQ.verbal',          modul: 'IQ',    label: 'Penalaran Verbal',        keywords: ['PKB B', 'PENALARAN VERBAL', 'VERBAL'] },
+  { key: 'IQ.numerik',         modul: 'IQ',    label: 'Kemampuan Numerik',       keywords: ['PKB C', 'KEMAMPUAN NUMERIK', 'PENALARAN KUANTITATIF', 'KUANTITATIF', 'NUMERIK'] },
+  { key: 'IQ.spasial',         modul: 'IQ',    label: 'Penalaran Spasial',       keywords: ['PKB D', 'PENALARAN SPASIAL', 'PENALARAN RUANG', 'SPASIAL', 'RUANG'] },
+  { key: 'IQ.workingMemory',   modul: 'IQ',    label: 'Memori Kerja',            keywords: ['PKB E', 'MEMORI KERJA', 'WORKING MEMORY'] },
+  { key: 'IQ.processingSpeed', modul: 'IQ',    label: 'Kecepatan Pemrosesan',    keywords: ['PKB F', 'PEMROSESAN', 'KECEPATAN PEMROSESAN', 'PROCESSING SPEED'] },
 
-  // MODUL B: Kematangan Emosi (EQ) - 3 Subtes
-  { key: 'EQ.empati',          modul: 'EQ',    label: 'Empati',                  keywords: ['PPD 1', 'EMPATI'] },
-  { key: 'EQ.regulasi',        modul: 'EQ',    label: 'Regulasi Emosi',          keywords: ['PPD 2', 'REGULASI'] },
-  { key: 'EQ.integritas',      modul: 'EQ',    label: 'Integritas',              keywords: ['PPD 3', 'INTEGRITAS'] },
+  // MODUL B: Kematangan Emosi (EQ) - 5 Subtes (Course 63 + Course 51)
+  { key: 'EQ.kesadaranDiri',   modul: 'EQ',    label: 'Kesadaran Diri',          keywords: ['EQ: BAGIAN A', 'KESADARAN DIRI', 'SELF-AWARENESS', 'QUIZ-EQ_SD13'] },
+  { key: 'EQ.regulasi',        modul: 'EQ',    label: 'Pengelolaan Diri',        keywords: ['EQ: BAGIAN B', 'PENGELOLAAN DIRI', 'REGULASI EMOSI', 'PPD 2', 'REGULASI'] },
+  { key: 'EQ.empati',          modul: 'EQ',    label: 'Kesadaran Sosial & Empati', keywords: ['EQ: BAGIAN C', 'KESADARAN SOSIAL', 'PPD 1', 'EMPATI'] },
+  { key: 'EQ.relasi',          modul: 'EQ',    label: 'Keterampilan Berelasi',   keywords: ['EQ: BAGIAN D', 'KETERAMPILAN BERELASI', 'RELASI', 'PPD 3', 'INTEGRITAS'] },
+  { key: 'EQ.keputusan',       modul: 'EQ',    label: 'Pengambilan Keputusan',   keywords: ['EQ: BAGIAN E', 'PENGAMBILAN KEPUTUSAN', 'KEPUTUSAN'] },
 
-  // MODUL C: Kesadaran Batin (SQ) - 3 Subtes
-  { key: 'SQ.kesadaranDiri',   modul: 'SQ',    label: 'Kesadaran Diri',          keywords: ['PKD&R 1', 'PKD&R  1', 'KESADARAN DIRI'] },
-  { key: 'SQ.nilaiNiat',       modul: 'SQ',    label: 'Nilai & Niat',            keywords: ['PKD&R 2', 'PKD&R  2', 'NILAI & NIAT'] },
-  { key: 'SQ.tanggungJawab',   modul: 'SQ',    label: 'Tanggung Jawab',          keywords: ['PKD&R 3', 'PKD&R  3', 'TANGGUNG JAWAB'] },
+  // MODUL C: Kesadaran Batin (SQ) - 5 Subtes (Course 63 + Course 51)
+  { key: 'SQ.kesadaranDiri',   modul: 'SQ',    label: 'Kesadaran Makna & Diri',  keywords: ['SQ: BAGIAN A', 'KESADARAN MAKNA', 'PKD&R 1', 'PKD&R  1', 'KESADARAN DIRI & MAKNA', 'QUIZ-SQ_SD13'] },
+  { key: 'SQ.nilaiNiat',       modul: 'SQ',    label: 'Nilai & Integritas',      keywords: ['SQ: BAGIAN B', 'NILAI, INTEGRITAS', 'PKD&R 2', 'PKD&R  2', 'NILAI & NIAT'] },
+  { key: 'SQ.tujuanMakna',     modul: 'SQ',    label: 'Tujuan & Arah Makna',     keywords: ['SQ: BAGIAN C', 'TUJUAN, ARAH', 'TUJUAN & MAKNA', 'TUJUAN HIDUP'] },
+  { key: 'SQ.tanggungJawab',   modul: 'SQ',    label: 'Kepedulian & Tanggung Jawab', keywords: ['SQ: BAGIAN D', 'KETERHUBUNGAN, KEPEDULIAN', 'PKD&R 3', 'PKD&R  3', 'TANGGUNG JAWAB & HUBUNGAN'] },
+  { key: 'SQ.refleksi',        modul: 'SQ',    label: 'Refleksi & Perspektif',   keywords: ['SQ: BAGIAN E', 'REFLEKSI, PERSPEKTIF', 'REFLEKSI'] },
 
-  // MODUL D: Minat (Pola Minat Utama) - 8 Subtes
+  // MODUL D: Minat (Pola Minat Utama) - Course 51 (Preferensi & Kedalaman) + Course 63 (8 Subtes)
+  { key: 'Minat.preferensi',   modul: 'Minat', label: 'Preferensi Minat',        keywords: ['BAGIAN A - PREFERENSI MINAT', 'PREFERENSI MINAT'] },
+  { key: 'Minat.kedalaman',    modul: 'Minat', label: 'Kedalaman Minat',         keywords: ['BAGIAN B - KEDALAMAN', 'KEDALAMAN, EKSPLORASI', 'KEDALAMAN MINAT'] },
   { key: 'Minat.akademik',     modul: 'Minat', label: 'Akademik',                keywords: ['MINAT AKADEMIK', 'AKADEMIK'] },
   { key: 'Minat.seni',         modul: 'Minat', label: 'Seni & Kreativitas',      keywords: ['MINAT SENI', 'SENI & KREATIVITAS'] },
   { key: 'Minat.sosial',       modul: 'Minat', label: 'Sosial',                  keywords: ['MINAT SOSIAL'] },
@@ -28,7 +34,9 @@ const KUIS_MAPPING = [
   { key: 'Minat.olahraga',     modul: 'Minat', label: 'Olahraga',                keywords: ['MINAT OLAHRAGA'] },
   { key: 'Minat.kepemimpinan', modul: 'Minat', label: 'Kepemimpinan',            keywords: ['MINAT KEPEMIMPINAN', 'KEPEMIMPINAN DAN ORGANISASI'] },
 
-  // MODUL E: Bakat (Aptitude Spesifik) - 6 Subtes
+  // MODUL E: Bakat / Potensi (Aptitude Spesifik) - Course 51 + Course 63
+  { key: 'Bakat.potensiKognitif', modul: 'Bakat', label: 'Potensi Kognitif & Penalaran', keywords: ['BAGIAN C - POTENSI KOGNITIF', 'POTENSI KOGNITIF & PENALARAN', 'POTENSI KOGNITIF'] },
+  { key: 'Bakat.potensiSosial',   modul: 'Bakat', label: 'Potensi Sosial & Kolaborasi',  keywords: ['BAGIAN D - POTENSI SOSIAL', 'POTENSI SOSIAL, KOMUNIKASI', 'POTENSI SOSIAL'] },
   { key: 'Bakat.numerik',       modul: 'Bakat', label: 'Bakat Numerik',          keywords: ['BAKAT NUMERIK'] },
   { key: 'Bakat.logika',        modul: 'Bakat', label: 'Logika',                 keywords: ['LOGIKA (11', 'LOGIKA'] },
   { key: 'Bakat.bahasa',        modul: 'Bakat', label: 'Bahasa',                 keywords: ['BAHASA (21', 'BAHASA'] },
@@ -37,10 +45,10 @@ const KUIS_MAPPING = [
   { key: 'Bakat.sosialPemimpin',modul: 'Bakat', label: 'Sosial & Kepemimpinan',  keywords: ['SOSIAL & KEPEMIMPINAN', 'SOSIAL (51'] },
 
   // MODUL F: Lingkungan (Faktor Eksternal) - 4 Subtes
-  { key: 'Lingkungan.fasilitas',    modul: 'Lingkungan', label: 'Lingkungan Belajar',     keywords: ['LINGKUNGAN BELAJAR'] },
-  { key: 'Lingkungan.orangTua',     modul: 'Lingkungan', label: 'Hubungan dg Orang Tua',  keywords: ['HUBUNGAN DENGAN ORANG TUA', 'ORANG TUA'] },
-  { key: 'Lingkungan.dukunganMinat',modul: 'Lingkungan', label: 'Dukungan Minat',         keywords: ['DUKUNGAN MINAT'] },
-  { key: 'Lingkungan.kegiatanRumah',modul: 'Lingkungan', label: 'Kegiatan di Rumah',      keywords: ['KEGIATAN DI RUMAH'] }
+  { key: 'Lingkungan.fasilitas',    modul: 'Lingkungan', label: 'Lingkungan Belajar',     keywords: ['LINGKUNGAN BELAJAR', 'DIMENSI 1'] },
+  { key: 'Lingkungan.orangTua',     modul: 'Lingkungan', label: 'Hubungan dg Orang Tua',  keywords: ['HUBUNGAN DENGAN ORANG TUA', 'ORANG TUA', 'DUKUNGAN EMOSIONAL'] },
+  { key: 'Lingkungan.dukunganMinat',modul: 'Lingkungan', label: 'Dukungan Minat',         keywords: ['DUKUNGAN MINAT', 'DIMENSI 3', 'EKSPLORASI MINAT'] },
+  { key: 'Lingkungan.kegiatanRumah',modul: 'Lingkungan', label: 'Kegiatan di Rumah',      keywords: ['KEGIATAN DI RUMAH', 'DIMENSI 4', 'POLA PENGASUHAN'] }
 ];
 
 // Tabel Lookup Teks Interpretasi Standar

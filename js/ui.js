@@ -287,18 +287,34 @@ function populateTemplate(student) {
   // Halaman 1 Charts (5 Charts)
   // Radar IQ & Bakat (6 Sumbu Standar)
   const iqData = student.subtopics['IQ'] || [];
-  const bakatData = student.subtopics['Bakat'] || [];
-  const eqData = student.subtopics['EQ'] || [];
-  const sqData = student.subtopics['SQ'] || [];
-  const minData = student.subtopics['Minat'] || [];
+  const bakatData = (student.subtopics['Bakat'] || []).filter(x => x.attempted);
+  const eqData = (student.subtopics['EQ'] || []).filter(x => x.attempted);
+  const sqData = (student.subtopics['SQ'] || []).filter(x => x.attempted);
+  const minData = (student.subtopics['Minat'] || []).filter(x => x.attempted);
+
+  // Jika bakatData kosong tapi subtopics Bakat ada, gunakan data standar bila Course 63
+  const bakatDisplay = bakatData.length > 0 ? bakatData : (student.subtopics['Bakat'] || []);
 
   renderChart('iqRadarChart', 'radar', iqData, 'Kemampuan Kognitif', 'rgba(79, 70, 229, 0.25)', '#4F46E5', null);
-  renderChart('bakatRadarChart', 'radar', bakatData, 'Bakat', 'rgba(236, 72, 153, 0.25)', '#EC4899', null);
+  renderChart('bakatRadarChart', 'radar', bakatDisplay, 'Bakat & Potensi', 'rgba(236, 72, 153, 0.25)', '#EC4899', null);
 
   // Bar EQ, SQ, Minat
   renderChart('eqBarChart', 'bar', eqData, 'Kematangan Emosi', 'rgba(34, 197, 94, 0.7)', '#16A34A', false);
   renderChart('sqBarChart', 'bar', sqData, 'Kesadaran Batin', 'rgba(14, 165, 233, 0.7)', '#0284C7', false);
   renderChart('minatBarChart', 'bar', minData, 'Minat', 'rgba(245, 158, 11, 0.85)', '#D97706', true); // Minat Horizontal Bar
+
+  // Dynamic Jenjang Tagline & Branding
+  const jenjangDetected = (typeof detectJenjang === 'function') ? detectJenjang(student.program) : 'SD_4_6';
+  const JENJANG_TITLES = {
+    'SD_1_3': 'MENGENALI DIRIKU (Discovering Me)',
+    'SD_4_6': 'MENGENALI POTENSIKU (Discovering My Potential)',
+    'SMP': 'MENGEKSPLORASI POTENSIKU (Exploring My Potential)',
+    'SMA': 'MENEMUKAN ARAHKU (Exploring My Direction)'
+  };
+  const jenjangPillEl = document.getElementById('pdfReportJenjangPill');
+  if (jenjangPillEl) {
+    jenjangPillEl.textContent = JENJANG_TITLES[jenjangDetected] || 'MENGENALI POTENSIKU';
+  }
 
   // Halaman 2 & 3 Text & Interpretasi Master V2 (Adaptif Jenjang & Usia)
   let full = null;
@@ -316,7 +332,7 @@ function populateTemplate(student) {
 
   // Halaman 3 Top 3 & Sinergi
   renderTop3ListHtml('minatTop3List', minData, '#D97706');
-  renderTop3ListHtml('bakatTop3List', bakatData, '#EC4899');
+  renderTop3ListHtml('bakatTop3List', bakatDisplay, '#EC4899');
   updateSinergiMinatPotensi(student, full);
 }
 
@@ -328,10 +344,9 @@ function updateKognitifDomain(student, full) {
   const pointsEl = document.getElementById('pdfIqPoints');
   if (!badgeEl || !textEl) return;
 
-  if (values.length > 0) {
-    const attemptedValues = values.filter(x => x.attempted);
-    const targetPool = attemptedValues.length > 0 ? attemptedValues : values;
-    const avg = targetPool.reduce((sum, item) => sum + item.nilai, 0) / targetPool.length;
+  const attemptedValues = values.filter(x => x.attempted);
+  if (attemptedValues.length > 0) {
+    const avg = attemptedValues.reduce((sum, item) => sum + item.nilai, 0) / attemptedValues.length;
     const lvl = engine.classifyScore(avg);
 
     badgeEl.textContent = `${lvl.label} (${avg.toFixed(1)}%)`;
@@ -371,6 +386,12 @@ function updateKognitifDomain(student, full) {
       textEl.innerText = "Data evaluasi subtopik sedang dalam proses standardisasi.";
       if (pointsEl) pointsEl.style.display = 'none';
     }
+  } else {
+    badgeEl.textContent = "Belum Mengikuti";
+    badgeEl.className = "score-badge bg-secondary mb-0";
+    if (normBadgeEl) normBadgeEl.style.display = 'none';
+    textEl.innerText = "Asesmen kemampuan kognitif belum diselesaikan oleh peserta didik.";
+    if (pointsEl) pointsEl.style.display = 'none';
   }
 }
 
@@ -381,10 +402,9 @@ function updateEQDomain(student, full) {
   const pointsEl = document.getElementById('pdfEqPoints');
   if (!badgeEl || !textEl) return;
 
-  if (values.length > 0) {
-    const attemptedValues = values.filter(x => x.attempted);
-    const targetPool = attemptedValues.length > 0 ? attemptedValues : values;
-    const avg = targetPool.reduce((sum, item) => sum + item.nilai, 0) / targetPool.length;
+  const attemptedValues = values.filter(x => x.attempted);
+  if (attemptedValues.length > 0) {
+    const avg = attemptedValues.reduce((sum, item) => sum + item.nilai, 0) / attemptedValues.length;
     const lvl = engine.classifyScore(avg);
 
     badgeEl.textContent = `${lvl.label} (${avg.toFixed(1)}%)`;
@@ -420,6 +440,11 @@ function updateEQDomain(student, full) {
       textEl.innerText = "Data evaluasi subtopik sedang dalam proses standardisasi.";
       if (pointsEl) pointsEl.style.display = 'none';
     }
+  } else {
+    badgeEl.textContent = "Belum Mengikuti";
+    badgeEl.className = "score-badge bg-secondary mb-0";
+    textEl.innerText = "Asesmen kematangan emosi (EQ) belum diselesaikan oleh peserta didik.";
+    if (pointsEl) pointsEl.style.display = 'none';
   }
 }
 
@@ -430,10 +455,9 @@ function updateSQDomain(student, full) {
   const pointsEl = document.getElementById('pdfSqPoints');
   if (!badgeEl || !textEl) return;
 
-  if (values.length > 0) {
-    const attemptedValues = values.filter(x => x.attempted);
-    const targetPool = attemptedValues.length > 0 ? attemptedValues : values;
-    const avg = targetPool.reduce((sum, item) => sum + item.nilai, 0) / targetPool.length;
+  const attemptedValues = values.filter(x => x.attempted);
+  if (attemptedValues.length > 0) {
+    const avg = attemptedValues.reduce((sum, item) => sum + item.nilai, 0) / attemptedValues.length;
     const lvl = engine.classifyScore(avg);
 
     badgeEl.textContent = `${lvl.label} (${avg.toFixed(1)}%)`;
@@ -469,6 +493,11 @@ function updateSQDomain(student, full) {
       textEl.innerText = "Data evaluasi subtopik sedang dalam proses standardisasi.";
       if (pointsEl) pointsEl.style.display = 'none';
     }
+  } else {
+    badgeEl.textContent = "Belum Mengikuti";
+    badgeEl.className = "score-badge bg-secondary mb-0";
+    textEl.innerText = "Asesmen kesadaran batin (SQ) belum diselesaikan oleh peserta didik.";
+    if (pointsEl) pointsEl.style.display = 'none';
   }
 }
 
@@ -501,14 +530,10 @@ function updateSinergiMinatPotensi(student, full) {
     } else if (rekWrapperEl) {
       rekWrapperEl.style.display = 'none';
     }
-  } else if (student.kombinasi && student.kombinasi.length > 0) {
-    if (profilWrapperEl) profilWrapperEl.style.display = 'none';
-    if (rekWrapperEl) rekWrapperEl.style.display = 'none';
-    textEl.innerHTML = `<ul class='mb-0 ps-3' style='font-size: 8.8pt; line-height: 1.5;'>` + student.kombinasi.map(k => `<li class='mb-1 pb-1'>${k}</li>`).join('') + `</ul>`;
   } else {
     if (profilWrapperEl) profilWrapperEl.style.display = 'none';
     if (rekWrapperEl) rekWrapperEl.style.display = 'none';
-    textEl.innerText = "Proses asesmen silang memerlukan kelengkapan data kuis penuh untuk ditarik matriks kombinasinya.";
+    textEl.innerText = "Asesmen minat dan potensi belum diselesaikan oleh peserta didik.";
   }
 }
 

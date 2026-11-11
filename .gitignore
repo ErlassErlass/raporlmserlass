@@ -6,3 +6,4 @@ config.local.php
 # OS Files
 .DS_Store
 Thumbs.db
+
