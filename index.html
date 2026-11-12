@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="css/vendor/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/vendor/all.min.css">
-  <link rel="stylesheet" href="css/style.css?v=3.3.0">
+  <link rel="stylesheet" href="css/style.css?v=3.4.0">
   <style>
     .auth-gate-container {
       min-height: 100vh;
@@ -358,26 +358,26 @@
               <div class="report-body">
 
                 <!-- Kombinasi RADAR: IQ & Bakat -->
-                <div class="row g-4 mb-4">
+                <div class="row g-3 mb-3">
                   <div class="col-6">
-                    <h6 class="domain-title text-center text-primary border-bottom pb-2">Profil Kemampuan Belajar</h6>
-                    <div class="chart-box" style="height: 320px;">
+                    <h6 class="domain-title text-center text-primary border-bottom pb-1">Profil Kemampuan Belajar</h6>
+                    <div class="chart-box" style="height: 280px;">
                       <canvas id="iqRadarChart"></canvas>
                     </div>
                   </div>
                   <div class="col-6">
-                    <h6 class="domain-title text-center text-primary border-bottom pb-2">Pemetaan Bakat (Aptitude)</h6>
-                    <div class="chart-box" style="height: 320px;">
+                    <h6 id="bakatRadarTitle" class="domain-title text-center text-primary border-bottom pb-1">Pemetaan Bakat (Aptitude)</h6>
+                    <div class="chart-box" style="height: 280px;">
                       <canvas id="bakatRadarChart"></canvas>
                     </div>
                   </div>
                 </div>
 
                 <!-- Grafik Minat (Dimensi Lebar) -->
-                <div class="row mt-4">
+                <div class="row mt-2">
                   <div class="col-12">
-                    <h6 class="domain-title text-center text-primary border-bottom pb-2">Pemetaan Pola Minat Utama</h6>
-                    <div class="chart-box mt-3" style="height: 290px;">
+                    <h6 class="domain-title text-center text-primary border-bottom pb-1">Pemetaan Pola Minat Utama</h6>
+                    <div class="chart-box mt-2" style="height: 250px;">
                       <canvas id="minatBarChart"></canvas>
                     </div>
                   </div>
@@ -396,73 +396,73 @@
             <div class="a4-page page-2">
 
               <!-- Kop Surat Mini -->
-              <div class="report-header kop-surat d-flex justify-content-between align-items-center mb-4 pb-2"
+              <div class="report-header kop-surat d-flex justify-content-between align-items-center mb-2 pb-1"
                 style="border-bottom: 2px dotted #64748B;">
                 <div class="logo-left">
-                  <img src="img/logo_erlass.png" height="32" alt="Erlass Logo" style="object-fit: contain;">
+                  <img src="img/logo_erlass.png" height="28" alt="Erlass Logo" style="object-fit: contain;">
                 </div>
                 <div class="kop-text text-center flex-grow-1 px-3">
-                  <div class="fw-bold" style="font-size: 11pt; color: #1e3a8a;">Erlass Academy</div>
-                  <div style="font-size: 8pt; color: #475569;">Ekspansi Grafis & Diagnostik Kognitif (Halaman 2 / 3)</div>
+                  <div class="fw-bold" style="font-size: 10.5pt; color: #1e3a8a;">Erlass Academy</div>
+                  <div style="font-size: 7.5pt; color: #475569;">Ekspansi Grafis &amp; Diagnostik Kognitif (Halaman 2 / 3)</div>
                 </div>
                 <div class="logo-right text-end">
-                  <img src="img/logoerlassacademy.png" height="30" alt="Erlass Academy Logo" style="object-fit: contain;">
+                  <img src="img/logoerlassacademy.png" height="26" alt="Erlass Academy Logo" style="object-fit: contain;">
                 </div>
               </div>
 
               <!-- Bar Ekstra: EQ & SQ -->
-              <div class="row g-3 mb-3">
+              <div class="row g-3 mb-2">
                 <div class="col-6">
-                  <h6 class="domain-title text-center text-primary border-bottom pb-1" style="font-size: 10.5pt;">
-                    Peta Pengembangan Diri</h6>
-                  <div class="chart-box mt-2" style="height: 185px;">
+                  <h6 class="domain-title text-center text-primary border-bottom pb-1" style="font-size: 10pt;">
+                    Peta Pengembangan Diri (EQ)</h6>
+                  <div class="chart-box mt-1" style="height: 165px;">
                     <canvas id="eqBarChart"></canvas>
                   </div>
                 </div>
                 <div class="col-6">
-                  <h6 class="domain-title text-center text-primary border-bottom pb-1" style="font-size: 10.5pt;">
-                    Pemetaan Kesadaran Diri &amp; Relasi</h6>
-                  <div class="chart-box mt-2" style="height: 185px;">
+                  <h6 class="domain-title text-center text-primary border-bottom pb-1" style="font-size: 10pt;">
+                    Pemetaan Kesadaran Diri &amp; Relasi (SQ)</h6>
+                  <div class="chart-box mt-1" style="height: 165px;">
                     <canvas id="sqBarChart"></canvas>
                   </div>
                 </div>
               </div>
 
-              <div class="text-center mb-3">
-                <h3 class="section-title mb-0 d-inline-block pb-1" style="border-bottom: 2px solid #1e3a8a; font-size: 12.5pt;">Analisis
+              <div class="text-center mb-2">
+                <h3 class="section-title mb-0 d-inline-block pb-1" style="border-bottom: 2px solid #1e3a8a; font-size: 11.5pt;">Analisis
                   Pendalaman Kognitif &amp; Karakter</h3>
               </div>
 
-              <div class="row g-3">
+              <div class="row g-2">
                 <div class="col-12">
-                  <div class="interpretation-card mb-2" id="pdfIqCard">
+                  <div class="interpretation-card mb-2 p-2 border rounded bg-light-subtle" id="pdfIqCard">
                     <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
-                      <h6 class="domain-title text-primary mb-0" style="font-size: 10pt;"><i class="fas fa-brain me-2"></i> Profil Kemampuan Belajar</h6>
+                      <h6 class="domain-title text-primary mb-0" style="font-size: 9.5pt;"><i class="fas fa-brain me-1"></i> Profil Kemampuan Belajar</h6>
                       <div class="d-flex align-items-center gap-1">
                         <div id="pdfIqBadge" class="score-badge bg-sangat-tinggi mb-0">-</div>
-                        <div id="pdfIqNormBadge" class="badge bg-light text-primary border" style="font-size: 7.5pt; display: none;">-</div>
+                        <div id="pdfIqNormBadge" class="badge bg-light text-primary border" style="font-size: 7.2pt; display: none;">-</div>
                       </div>
                     </div>
-                    <div id="pdfIqText" class="text-interpretation text-justify" style="font-size: 8.8pt; line-height: 1.45;"></div>
-                    <div id="pdfIqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 8pt;"></div>
+                    <div id="pdfIqText" class="text-interpretation text-justify" style="font-size: 8.15pt; line-height: 1.36;"></div>
+                    <div id="pdfIqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 7.4pt; line-height: 1.3;"></div>
                   </div>
 
-                  <div class="interpretation-card mb-2" id="pdfEqCard">
+                  <div class="interpretation-card mb-2 p-2 border rounded bg-light-subtle" id="pdfEqCard">
                     <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
-                      <h6 class="domain-title text-primary mb-0" style="font-size: 10pt;"><i class="fas fa-heart me-2"></i> Peta Pengembangan Diri (EQ)</h6>
+                      <h6 class="domain-title text-primary mb-0" style="font-size: 9.5pt;"><i class="fas fa-heart me-1"></i> Peta Pengembangan Diri (EQ)</h6>
                       <div id="pdfEqBadge" class="score-badge bg-tinggi mb-0">-</div>
                     </div>
-                    <div id="pdfEqText" class="text-interpretation text-justify" style="font-size: 8.8pt; line-height: 1.45;"></div>
-                    <div id="pdfEqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 8pt;"></div>
+                    <div id="pdfEqText" class="text-interpretation text-justify" style="font-size: 8.15pt; line-height: 1.36;"></div>
+                    <div id="pdfEqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 7.4pt; line-height: 1.3;"></div>
                   </div>
 
-                  <div class="interpretation-card mb-2" id="pdfSqCard">
+                  <div class="interpretation-card mb-1 p-2 border rounded bg-light-subtle" id="pdfSqCard">
                     <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap">
-                      <h6 class="domain-title text-primary mb-0" style="font-size: 10pt;"><i class="fas fa-dove me-2"></i> Pemetaan Kesadaran Diri &amp; Relasi (SQ)</h6>
+                      <h6 class="domain-title text-primary mb-0" style="font-size: 9.5pt;"><i class="fas fa-dove me-1"></i> Pemetaan Kesadaran Diri &amp; Relasi (SQ)</h6>
                       <div id="pdfSqBadge" class="score-badge bg-cukup mb-0">-</div>
                     </div>
-                    <div id="pdfSqText" class="text-interpretation text-justify" style="font-size: 8.8pt; line-height: 1.45;"></div>
-                    <div id="pdfSqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 8pt;"></div>
+                    <div id="pdfSqText" class="text-interpretation text-justify" style="font-size: 8.15pt; line-height: 1.36;"></div>
+                    <div id="pdfSqPoints" class="mt-1 pt-1 border-top" style="display: none; font-size: 7.4pt; line-height: 1.3;"></div>
                   </div>
                 </div>
               </div>
@@ -478,17 +478,17 @@
             <div class="a4-page page-3">
 
               <!-- Kop Surat Mini -->
-              <div class="report-header kop-surat d-flex justify-content-between align-items-center mb-4 pb-2"
+              <div class="report-header kop-surat d-flex justify-content-between align-items-center mb-3 pb-2"
                 style="border-bottom: 2px dotted #64748B;">
                 <div class="logo-left">
-                  <img src="img/logo_erlass.png" height="32" alt="Erlass Logo" style="object-fit: contain;">
+                  <img src="img/logo_erlass.png" height="30" alt="Erlass Logo" style="object-fit: contain;">
                 </div>
                 <div class="kop-text text-center flex-grow-1 px-3">
                   <div class="fw-bold" style="font-size: 11pt; color: #1e3a8a;">Erlass Academy</div>
                   <div style="font-size: 8pt; color: #475569;">Konklusi Khusus &amp; Pengesahan (Halaman 3 / 3)</div>
                 </div>
                 <div class="logo-right text-end">
-                  <img src="img/logoerlassacademy.png" height="30" alt="Erlass Academy Logo" style="object-fit: contain;">
+                  <img src="img/logoerlassacademy.png" height="28" alt="Erlass Academy Logo" style="object-fit: contain;">
                 </div>
               </div>
 
@@ -498,13 +498,13 @@
                   <div class="interpretation-card mb-3 border rounded p-3 bg-light">
                     <h6 class="domain-title text-primary border-bottom pb-2"><i
                         class="fas fa-star text-warning me-2"></i> Tiga Minat Tertinggi</h6>
-                    <div id="minatTop3List" class="top-3-container ps-2 mt-2" style="font-size: 10pt;"></div>
+                    <div id="minatTop3List" class="top-3-container ps-2 mt-2" style="font-size: 9.5pt;"></div>
                   </div>
 
                   <div class="interpretation-card mb-3 border rounded p-3 bg-light">
-                    <h6 class="domain-title text-primary border-bottom pb-2"><i class="fas fa-gem text-danger me-2"></i>
+                    <h6 id="bakatTop3Title" class="domain-title text-primary border-bottom pb-2"><i class="fas fa-gem text-danger me-2"></i>
                       Tiga Bakat Paling Dominan</h6>
-                    <div id="bakatTop3List" class="top-3-container ps-2 mt-2" style="font-size: 10pt;"></div>
+                    <div id="bakatTop3List" class="top-3-container ps-2 mt-2" style="font-size: 9.5pt;"></div>
                   </div>
                 </div>
 
@@ -520,26 +520,26 @@
                       <span class="badge" style="background-color: #0d9488; font-size: 8.5pt;" id="pdfProfilPotensiBadge">Profil Potensi</span>
                     </div>
                     <div id="pdfKombinasiText" class="text-interpretation text-justify"
-                      style="font-size: 8.8pt; line-height: 1.5;">
+                      style="font-size: 8.6pt; line-height: 1.45;">
                       Sedang menganalisis matriks silang antar variabel...
                     </div>
                     <div id="pdfMinatPotensiRekWrapper" class="mt-2 pt-2 border-top border-info-subtle" style="display: none;">
-                      <div class="fw-bold mb-1" style="font-size: 8.5pt; color: #0f766e;"><i class="fas fa-compass me-1"></i> Rekomendasi Aktivitas &amp; Stimulasi:</div>
-                      <ul id="pdfMinatPotensiRekList" class="ps-3 mb-0" style="font-size: 8.2pt; line-height: 1.45; color: #334155;"></ul>
+                      <div class="fw-bold mb-1" style="font-size: 8.4pt; color: #0f766e;"><i class="fas fa-compass me-1"></i> Rekomendasi Aktivitas &amp; Stimulasi:</div>
+                      <ul id="pdfMinatPotensiRekList" class="ps-3 mb-0" style="font-size: 8pt; line-height: 1.4; color: #334155;"></ul>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Signature Area -->
-              <div class="signature-section mt-5 pt-4">
+              <div class="signature-section mt-4 pt-3">
                 <div class="row">
                   <div class="col-7"></div>
                   <div class="col-5 text-center">
                     <p class="mb-1"><strong>Jakarta, <span id="sigTanggal"></span></strong></p>
-                    <p class="mb-5 text-muted">Tim Psikolog<br>Erlass Prokreatif Indonesia</p>
+                    <p class="mb-4 text-muted">Tim Psikolog<br>Erlass Prokreatif Indonesia</p>
                     <!-- TTD Placeholder Line -->
-                    <div style="border-bottom: 1px solid black; width: 80%; margin: 60px auto 5px;"></div>
+                    <div style="border-bottom: 1px solid black; width: 80%; margin: 48px auto 5px;"></div>
                     <p class="mb-0 fw-bold">Penanggung Jawab Asesmen</p>
                   </div>
                 </div>
@@ -587,10 +587,10 @@
   <script src="js/vendor/jszip.min.js"></script>
   <script src="js/vendor/pdf-encrypt-lite.bundle.js"></script>
 
-  <script src="js/data-mapping.js?v=3.2.0"></script>
-  <script src="js/erlass-interpretation-engine-v2.js?v=3.2.0"></script>
-  <script src="js/engine.js?v=3.2.0"></script>
-  <script src="js/ui.js?v=3.2.0"></script>
+  <script src="js/data-mapping.js?v=3.4.0"></script>
+  <script src="js/erlass-interpretation-engine-v2.js?v=3.4.0"></script>
+  <script src="js/engine.js?v=3.4.0"></script>
+  <script src="js/ui.js?v=3.4.0"></script>
 
 </body>
 

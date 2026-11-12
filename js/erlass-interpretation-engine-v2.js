@@ -675,10 +675,13 @@ function generateMinatPotensiReport(scores, jenjangKey = 'SD_4_6') {
     ];
   }
 
-  // 4. Lapisan 3: Catatan Sedang yang Relevan (jika ada domain tinggi dan ada domain sedang)
+  // 4. Lapisan 3: Catatan Sedang yang Relevan (hanya dari domain potensi yang benar-benar diuji)
   let kalimatSedang = '';
-  if (highPotensi.length > 0 && sedangPotensi.length > 0 && highPotensi.length < 4) {
-    const namaSedang = sedangPotensi.map(k => DOMAIN_MINAT_POTENSI[k].labelSingkat).join(' serta ');
+  const testedSedang = Array.isArray(scores._testedPotensi)
+    ? sedangPotensi.filter(k => scores._testedPotensi.includes(k))
+    : sedangPotensi;
+  if (highPotensi.length > 0 && testedSedang.length > 0 && highPotensi.length < 4) {
+    const namaSedang = testedSedang.map(k => DOMAIN_MINAT_POTENSI[k].labelSingkat).join(' serta ');
     if (j === 'SD_1_3') {
       kalimatSedang = ` Kemampuan ${namaSedang.toLowerCase()} berkembang cukup baik dan dapat terus dilatih melalui permainan yang menyenangkan.`;
     } else if (j === 'SD_4_6') {
@@ -689,12 +692,16 @@ function generateMinatPotensiReport(scores, jenjangKey = 'SD_4_6') {
   }
 
   // 5. Satukan Paragraf Narasi (80-150 kata)
-  const interpretasiLengkap = `${kalimatMinat} Pada sisi potensi, ${kalimatPotensi.toLowerCase().startsWith('siswa') || kalimatPotensi.toLowerCase().startsWith('anak') ? kalimatPotensi : kalimatPotensi}${kalimatSedang}`;
+  const potensiLead = kalimatPotensi ? (kalimatPotensi.charAt(0).toLowerCase() + kalimatPotensi.slice(1)) : '';
+  const interpretasiLengkap = `${kalimatMinat} Pada sisi potensi, ${potensiLead}${kalimatSedang}`;
 
-  // 6. Siapkan Area Pengembangan
+  // 6. Siapkan Area Pengembangan (hanya dari domain yang diuji)
   let areaPengembanganList = [];
-  if (rendahPotensi.length > 0 && rendahPotensi.length < 4) {
-    areaPengembanganList = rendahPotensi.map(k => DOMAIN_MINAT_POTENSI[k].labelSingkat);
+  const testedRendah = Array.isArray(scores._testedPotensi)
+    ? rendahPotensi.filter(k => scores._testedPotensi.includes(k))
+    : rendahPotensi;
+  if (testedRendah.length > 0 && testedRendah.length < 4) {
+    areaPengembanganList = testedRendah.map(k => DOMAIN_MINAT_POTENSI[k].labelSingkat);
   }
 
   return {
@@ -914,37 +921,46 @@ function updateStudentReportFull(student, uiHelpers = {}) {
 
   // Hanya susun narasi jika siswa benar-benar telah mengikuti asesmen Minat / Bakat
   if (attemptedMinat.length > 0 || attemptedBakat.length > 0) {
-    const prefItem = attemptedMinat.find(m => /PREFERENSI/i.test(m.label) || /preferensi/i.test(m.key));
-    const depthItem = attemptedMinat.find(m => /KEDALAMAN/i.test(m.label) || /kedalaman/i.test(m.key));
+    const prefItem = attemptedMinat.find(m => m.key === 'Minat.preferensi' || /PREFERENSI/i.test(m.label));
+    const depthItem = attemptedMinat.find(m => m.key === 'Minat.kedalaman' || /KEDALAMAN/i.test(m.label));
 
     let avgMinatPref = prefItem ? prefItem.nilai : null;
     let avgMinatDepth = depthItem ? depthItem.nilai : null;
 
     if (avgMinatPref === null && attemptedMinat.length > 0) {
-      const sorted = [...attemptedMinat].sort((a, b) => b.nilai - a.nilai);
+      const domainMinat = attemptedMinat.filter(m => !m.isSubdimension);
+      const pool = domainMinat.length > 0 ? domainMinat : attemptedMinat;
+      const sorted = [...pool].sort((a, b) => b.nilai - a.nilai);
       avgMinatPref = sorted[0].nilai;
       avgMinatDepth = sorted.length > 1 ? (sorted[0].nilai + sorted[1].nilai) / 2 : sorted[0].nilai;
     }
 
-    const allAptitude = [...attemptedBakat, ...attemptedMinat];
-    const findScore = (regex, fallback) => {
-      const match = allAptitude.find(b => regex.test(b.label) || regex.test(b.key));
-      return match ? match.nilai : fallback;
-    };
+    // Potensi C–F hanya diambil dari instrumen potensi/bakat nyata (bukan sub-dimensi ipsatif MI-1..MI-7)
+    const realMinatCompetency = attemptedMinat.filter(m => !m.isSubdimension && !['Minat.preferensi', 'Minat.kedalaman'].includes(m.key));
+    const realBakat = attemptedBakat.filter(b => !b.isSubdimension);
+    const allAptitude = [...realBakat, ...realMinatCompetency];
 
-    const defaultScore = avgMinatPref ?? 55;
-    const potC = findScore(/KOGNITIF|LOGIKA|NUMERIK|PENALARAN/i, defaultScore);
-    const potD = findScore(/KREATIF|SENI|VISUAL|MUSIK/i, defaultScore);
-    const potE = findScore(/MOTORIK|PRAKTIS|OLAHRAGA/i, defaultScore);
-    const potF = findScore(/SOSIAL|KOMUNIKASI|PEMIMPIN/i, defaultScore);
+    const findMatch = (regex) => allAptitude.find(b => regex.test(b.key) || regex.test(b.label));
+    const matchC = findMatch(/potensiKognitif|KOGNITIF|LOGIKA|NUMERIK|PENALARAN/i);
+    const matchD = findMatch(/potensiKreatif|KREATIF|SENI|VISUAL|MUSIK/i);
+    const matchE = findMatch(/potensiMotorik|MOTORIK|PRAKTIS|OLAHRAGA/i);
+    const matchF = findMatch(/potensiSosial|SOSIAL|KOMUNIKASI|PEMIMPIN/i);
 
+    const testedPotensi = [];
+    if (matchC) testedPotensi.push('C');
+    if (matchD) testedPotensi.push('D');
+    if (matchE) testedPotensi.push('E');
+    if (matchF) testedPotensi.push('F');
+
+    const neutralFallback = 55; // Sedang netral untuk subtes potensi yang belum diujikan
     minatPotensiResult = generateMinatPotensiReport({
-      A: avgMinatPref ?? defaultScore,
-      B: avgMinatDepth ?? defaultScore,
-      C: potC,
-      D: potD,
-      E: potE,
-      F: potF
+      A: avgMinatPref ?? neutralFallback,
+      B: avgMinatDepth ?? neutralFallback,
+      C: matchC ? matchC.nilai : neutralFallback,
+      D: matchD ? matchD.nilai : neutralFallback,
+      E: matchE ? matchE.nilai : neutralFallback,
+      F: matchF ? matchF.nilai : neutralFallback,
+      _testedPotensi: testedPotensi.length > 0 ? testedPotensi : null
     }, jenjang);
   }
 
@@ -953,18 +969,18 @@ function updateStudentReportFull(student, uiHelpers = {}) {
   const eqItems = student.subtopics?.['EQ'] || [];
   const attemptedEQ = eqItems.filter(x => x.attempted);
   if (attemptedEQ.length > 0) {
-    const sA = attemptedEQ.find(it => /KESADARAN/i.test(it.label))?.nilai;
-    const sB = attemptedEQ.find(it => /REGULASI|PENGENDALIAN|PENGELOLAAN/i.test(it.label))?.nilai;
-    const sC = attemptedEQ.find(it => /EMPATI|SOSIAL/i.test(it.label))?.nilai;
-    const sD = attemptedEQ.find(it => /RELASI|INTEGRITAS|HUBUNGAN|KEPUTUSAN/i.test(it.label))?.nilai;
-
     const eqAvg = attemptedEQ.reduce((acc, it) => acc + it.nilai, 0) / attemptedEQ.length;
-    eqResult = generateEQReport({
-      A: sA ?? eqAvg,
-      B: sB ?? eqAvg,
-      C: sC ?? eqAvg,
-      D: sD ?? eqAvg
-    }, jenjang);
+    const itemA = attemptedEQ.find(it => it.key === 'EQ.kesadaranDiri' || (/KESADARAN DIRI/i.test(it.label) && !/EMPATI/i.test(it.label)));
+    const itemB = attemptedEQ.find(it => it.key === 'EQ.regulasi' || /REGULASI|PENGENDALIAN|PENGELOLAAN/i.test(it.label));
+    const itemC = attemptedEQ.find(it => it.key === 'EQ.empati' || /EMPATI/i.test(it.label));
+    const itemsD = attemptedEQ.filter(it => it.key === 'EQ.relasi' || it.key === 'EQ.keputusan' || /RELASI|INTEGRITAS|KEPUTUSAN/i.test(it.label));
+
+    const sA = itemA ? itemA.nilai : eqAvg;
+    const sB = itemB ? itemB.nilai : eqAvg;
+    const sC = itemC ? itemC.nilai : eqAvg;
+    const sD = itemsD.length > 0 ? (itemsD.reduce((acc, it) => acc + it.nilai, 0) / itemsD.length) : eqAvg;
+
+    eqResult = generateEQReport({ A: sA, B: sB, C: sC, D: sD }, jenjang);
   }
 
   // 3. SQ Adapter
@@ -972,18 +988,18 @@ function updateStudentReportFull(student, uiHelpers = {}) {
   const sqItems = student.subtopics?.['SQ'] || [];
   const attemptedSQ = sqItems.filter(x => x.attempted);
   if (attemptedSQ.length > 0) {
-    const sA = attemptedSQ.find(it => /NILAI|INTEGRITAS/i.test(it.label))?.nilai;
-    const sB = attemptedSQ.find(it => /TUJUAN|NIAT/i.test(it.label))?.nilai;
-    const sC = attemptedSQ.find(it => /REFLEKSI|KESADARAN/i.test(it.label))?.nilai;
-    const sD = attemptedSQ.find(it => /PEDULI|TANGGUNG|HUBUNGAN/i.test(it.label))?.nilai;
-
     const sqAvg = attemptedSQ.reduce((acc, it) => acc + it.nilai, 0) / attemptedSQ.length;
-    sqResult = generateSQReport({
-      A: sA ?? sqAvg,
-      B: sB ?? sqAvg,
-      C: sC ?? sqAvg,
-      D: sD ?? sqAvg
-    }, jenjang);
+    const itemNilai = attemptedSQ.find(it => it.key === 'SQ.nilaiNiat' || /NILAI|INTEGRITAS/i.test(it.label));
+    const itemTujuan = attemptedSQ.find(it => it.key === 'SQ.tujuanMakna' || /TUJUAN|NIAT/i.test(it.label));
+    const itemsRefleksi = attemptedSQ.filter(it => it.key === 'SQ.refleksi' || it.key === 'SQ.kesadaranDiri' || /REFLEKSI|KESADARAN MAKNA/i.test(it.label));
+    const itemPeduli = attemptedSQ.find(it => it.key === 'SQ.tanggungJawab' || /PEDULI|TANGGUNG/i.test(it.label));
+
+    const sA = itemNilai ? itemNilai.nilai : sqAvg;
+    const sB = itemTujuan ? itemTujuan.nilai : sqAvg;
+    const sC = itemsRefleksi.length > 0 ? (itemsRefleksi.reduce((acc, it) => acc + it.nilai, 0) / itemsRefleksi.length) : sqAvg;
+    const sD = itemPeduli ? itemPeduli.nilai : sqAvg;
+
+    sqResult = generateSQReport({ A: sA, B: sB, C: sC, D: sD }, jenjang);
   }
 
   // 4. Kognitif Adapter

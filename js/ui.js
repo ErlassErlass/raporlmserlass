@@ -223,17 +223,22 @@ function renderTable(students) {
   const tbody = document.getElementById('studentTableBody');
   tbody.innerHTML = '';
 
+  const expectedTotal = (engine.rawData && engine.rawData.total_kuis)
+    ? parseInt(engine.rawData.total_kuis, 10)
+    : 30;
+
   students.forEach((s, idx) => {
-    // Hitung kuis yang sudah diselesaikan dari modul subtopik
+    // Hitung kuis riil yang sudah diselesaikan (kecuali sub-dimensi turunan)
     let attemptedCount = 0;
     Object.values(s.subtopics || {}).forEach(arr => {
-      attemptedCount += arr.filter(it => it.attempted).length;
+      attemptedCount += arr.filter(it => it.attempted && !it.isSubdimension).length;
     });
+    const finalAttempted = Math.max(attemptedCount, s.completedQuizzes || 0);
 
-    const isLengkap = attemptedCount >= 29;
-    const badge = isLengkap 
-      ? '<span class="badge bg-success">Siap (30/30)</span>' 
-      : `<span class="badge bg-warning text-dark">Parsial (${attemptedCount}/30)</span>`;
+    const isLengkap = expectedTotal > 0 && finalAttempted >= expectedTotal;
+    const badge = isLengkap
+      ? `<span class="badge bg-success">Siap (${finalAttempted}/${expectedTotal})</span>`
+      : `<span class="badge bg-warning text-dark">Parsial (${finalAttempted}/${expectedTotal})</span>`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -285,26 +290,57 @@ function populateTemplate(student) {
   document.getElementById('sigTanggal').textContent = tglTeks;
 
   // Halaman 1 Charts (5 Charts)
-  // Radar IQ & Bakat (6 Sumbu Standar)
+  const jenjangDetected = (typeof detectJenjang === 'function') ? detectJenjang(student.program) : 'SD_4_6';
   const iqData = student.subtopics['IQ'] || [];
-  const bakatData = (student.subtopics['Bakat'] || []).filter(x => x.attempted);
+  const attemptedBakat = (student.subtopics['Bakat'] || []).filter(x => x.attempted);
+  const nonSubBakat = attemptedBakat.filter(x => !x.isSubdimension);
+  const minatDepthDims = attemptedBakat.filter(x => x.isSubdimension);
+
   const eqData = (student.subtopics['EQ'] || []).filter(x => x.attempted);
   const sqData = (student.subtopics['SQ'] || []).filter(x => x.attempted);
-  const minData = (student.subtopics['Minat'] || []).filter(x => x.attempted);
 
-  // Jika bakatData kosong tapi subtopics Bakat ada, gunakan data standar bila Course 63
-  const bakatDisplay = bakatData.length > 0 ? bakatData : (student.subtopics['Bakat'] || []);
+  const allAttemptedMinat = (student.subtopics['Minat'] || []).filter(x => x.attempted);
+  const domainMinat = allAttemptedMinat.filter(x => !['Minat.preferensi', 'Minat.kedalaman'].includes(x.key));
+  const minData = domainMinat.length > 0 ? domainMinat : allAttemptedMinat;
 
-  renderChart('iqRadarChart', 'radar', iqData, 'Kemampuan Kognitif', 'rgba(79, 70, 229, 0.25)', '#4F46E5', null);
-  renderChart('bakatRadarChart', 'radar', bakatDisplay, 'Bakat & Potensi', 'rgba(236, 72, 153, 0.25)', '#EC4899', null);
+  // Radar kanan: Untuk SD 4-6 tampilkan 6 Bakat Aptitude. Untuk SMA/SMK tampilkan Potensi + Kedalaman Minat jika subtes Bakat < 3.
+  let bakatDisplay = [];
+  const bakatRadarTitleEl = document.getElementById('bakatRadarTitle');
+  const bakatTop3TitleEl = document.getElementById('bakatTop3Title');
+
+  if (jenjangDetected === 'SMA' || jenjangDetected === 'SMP') {
+    const prefItem = allAttemptedMinat.find(m => m.key === 'Minat.preferensi');
+    const smaRadarPool = [...nonSubBakat];
+    if (nonSubBakat.length < 4) {
+      if (prefItem) {
+        smaRadarPool.push({ ...prefItem, label: 'Kejelasan Minat' });
+      }
+      minatDepthDims.forEach(d => smaRadarPool.push(d));
+    }
+    bakatDisplay = smaRadarPool;
+
+    if (bakatRadarTitleEl) {
+      bakatRadarTitleEl.textContent = (nonSubBakat.length >= 4) ? 'Pemetaan Potensi & Bakat' : 'Profil Potensi & Komitmen Minat';
+    }
+    if (bakatTop3TitleEl) {
+      bakatTop3TitleEl.innerHTML = `<i class="fas fa-gem text-danger me-2"></i> ${(nonSubBakat.length >= 4) ? 'Tiga Potensi Paling Dominan' : 'Potensi & Komitmen Dominan'}`;
+    }
+  } else {
+    bakatDisplay = nonSubBakat;
+    if (bakatRadarTitleEl) bakatRadarTitleEl.textContent = 'Pemetaan Bakat (Aptitude)';
+    if (bakatTop3TitleEl) bakatTop3TitleEl.innerHTML = '<i class="fas fa-gem text-danger me-2"></i> Tiga Bakat Paling Dominan';
+  }
+
+  const hasIqAttempt = iqData.some(x => x.attempted);
+  renderChart('iqRadarChart', 'radar', hasIqAttempt ? iqData : [], 'Kemampuan Kognitif', 'rgba(79, 70, 229, 0.25)', '#4F46E5', null);
+  renderChart('bakatRadarChart', 'radar', bakatDisplay, 'Potensi & Bakat', 'rgba(236, 72, 153, 0.25)', '#EC4899', null);
 
   // Bar EQ, SQ, Minat
-  renderChart('eqBarChart', 'bar', eqData, 'Kematangan Emosi', 'rgba(34, 197, 94, 0.7)', '#16A34A', false);
-  renderChart('sqBarChart', 'bar', sqData, 'Kesadaran Batin', 'rgba(14, 165, 233, 0.7)', '#0284C7', false);
+  renderChart('eqBarChart', 'bar', eqData, 'Kematangan Emosi', 'rgba(34, 197, 94, 0.75)', '#16A34A', false);
+  renderChart('sqBarChart', 'bar', sqData, 'Kesadaran Batin', 'rgba(14, 165, 233, 0.75)', '#0284C7', false);
   renderChart('minatBarChart', 'bar', minData, 'Minat', 'rgba(245, 158, 11, 0.85)', '#D97706', true); // Minat Horizontal Bar
 
   // Dynamic Jenjang Tagline & Branding
-  const jenjangDetected = (typeof detectJenjang === 'function') ? detectJenjang(student.program) : 'SD_4_6';
   const JENJANG_TITLES = {
     'SD_1_3': 'MENGENALI DIRIKU (Discovering Me)',
     'SD_4_6': 'MENGENALI POTENSIKU (Discovering My Potential)',
@@ -541,7 +577,12 @@ function renderTop3ListHtml(elementId, items, color) {
   const el = document.getElementById(elementId);
   if (!el) return;
   el.innerHTML = '';
-  
+
+  if (!items || items.length === 0) {
+    el.innerHTML = '<div class="text-muted small py-2"><em>Data asesmen belum diselesaikan.</em></div>';
+    return;
+  }
+
   // Sort descending
   const sorted = [...items].sort((a, b) => b.nilai - a.nilai);
   const top3 = sorted.slice(0, 3);
@@ -559,10 +600,30 @@ function renderTop3ListHtml(elementId, items, color) {
 function renderChart(canvasId, type, itemData, title, bgColor, borderColor, isHorizontalBar) {
   const ctx = document.getElementById(canvasId);
   if (!ctx) return;
-  
+
   if (activeCharts[canvasId]) {
     activeCharts[canvasId].destroy();
     delete activeCharts[canvasId];
+  }
+
+  // Jika data benar-benar kosong (misal peserta belum mengerjakan modul EQ/SQ/Minat)
+  if (!itemData || itemData.length === 0) {
+    const context2d = ctx.getContext('2d');
+    const parentW = (ctx.parentElement && ctx.parentElement.clientWidth) ? ctx.parentElement.clientWidth : 340;
+    const parentH = (ctx.parentElement && ctx.parentElement.clientHeight) ? ctx.parentElement.clientHeight : 165;
+    ctx.width = parentW;
+    ctx.height = parentH;
+    context2d.clearRect(0, 0, ctx.width, ctx.height);
+    context2d.fillStyle = '#f8fafc';
+    context2d.fillRect(0, 0, ctx.width, ctx.height);
+    context2d.strokeStyle = '#e2e8f0';
+    context2d.strokeRect(1, 1, ctx.width - 2, ctx.height - 2);
+    context2d.fillStyle = '#94a3b8';
+    context2d.font = '600 12px "Plus Jakarta Sans", Inter, sans-serif';
+    context2d.textAlign = 'center';
+    context2d.textBaseline = 'middle';
+    context2d.fillText('Asesmen Belum Diselesaikan', ctx.width / 2, ctx.height / 2);
+    return;
   }
 
   // Register DataLabels globally if available
@@ -573,16 +634,25 @@ function renderChart(canvasId, type, itemData, title, bgColor, borderColor, isHo
   let options = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: false, 
-    plugins: { 
+    animation: false,
+    plugins: {
       legend: { display: false },
       datalabels: {
-        color: type === 'bar' ? '#ffffff' : '#0f172a',
-        font: { weight: 'bold', size: 12 },
+        color: (context) => {
+          if (type !== 'bar') return '#0f172a';
+          const val = context.dataset.data[context.dataIndex] || 0;
+          return val >= 35 ? '#ffffff' : '#0f172a';
+        },
+        font: { weight: 'bold', size: type === 'radar' ? 10 : 11 },
         formatter: (value) => Math.round(value) + '%',
-        anchor: type === 'bar' ? (isHorizontalBar ? 'end' : 'end') : 'center',
-        align: type === 'bar' ? (isHorizontalBar ? 'start' : 'bottom') : 'start',
-        offset: type === 'bar' ? 4 : 4,
+        anchor: type === 'bar' ? 'end' : 'center',
+        align: (context) => {
+          if (type !== 'bar') return 'start';
+          const val = context.dataset.data[context.dataIndex] || 0;
+          if (isHorizontalBar) return val >= 35 ? 'start' : 'end';
+          return val >= 35 ? 'bottom' : 'top';
+        },
+        offset: 4,
         backgroundColor: type === 'radar' ? 'rgba(255, 255, 255, 0.85)' : null,
         borderRadius: 3,
         padding: 2
@@ -590,42 +660,63 @@ function renderChart(canvasId, type, itemData, title, bgColor, borderColor, isHo
     }
   };
 
+  const wrapLabel2Lines = (lbl) => {
+    const clean = (lbl || '').trim();
+    const words = clean.split(/\s+/);
+    if (words.length <= 2) return clean.length > 14 ? words : clean;
+    const mid = Math.ceil(words.length / 2);
+    return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+  };
+
   if (type === 'radar') {
-    options.scales = { 
-      r: { 
-        min: 0, 
-        max: 100, 
-        ticks: { 
+    options.scales = {
+      r: {
+        min: 0,
+        max: 100,
+        ticks: {
           stepSize: 25,
-          display: false 
+          display: false
         },
         grid: { color: 'rgba(100, 116, 139, 0.25)' },
         angleLines: { color: 'rgba(100, 116, 139, 0.3)' },
         pointLabels: {
-          font: { size: 10, weight: 'bold' },
+          font: { size: 9.5, weight: 'bold' },
           color: '#1e293b'
         }
-      } 
+      }
     };
 
-    // Format short labels for radar axes
+    // Format short labels max 2 lines for radar axes
     itemData.forEach(c => {
-      let sl = c.label.replace(/Penalaran |Kemampuan |Bakat /g, '');
-      c.shortLabel = sl.split(' ');
+      let sl = c.label.replace(/Penalaran |Kemampuan |Bakat |Potensi /g, '');
+      const words = sl.trim().split(/\s+/);
+      if (words.length <= 2) {
+        c.shortLabel = words;
+      } else {
+        const mid = Math.ceil(words.length / 2);
+        c.shortLabel = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+      }
     });
   } else if (type === 'bar') {
-    options.indexAxis = isHorizontalBar ? 'y' : 'x'; 
+    options.indexAxis = isHorizontalBar ? 'y' : 'x';
     options.scales = {
-      x: { 
-        min: 0, 
+      x: {
+        min: 0,
         max: 100,
-        ticks: { font: { size: 10, weight: 'bold' } },
+        ticks: {
+          font: { size: isHorizontalBar ? 10 : 8.5, weight: 'bold' },
+          autoSkip: false,
+          maxRotation: 0
+        },
         grid: { color: 'rgba(100, 116, 139, 0.15)' }
       },
-      y: { 
+      y: {
         min: isHorizontalBar ? undefined : 0,
         max: isHorizontalBar ? undefined : 100,
-        ticks: { font: { size: 10, weight: 'bold' } },
+        ticks: {
+          font: { size: 9.5, weight: 'bold' },
+          autoSkip: false
+        },
         grid: { color: 'rgba(100, 116, 139, 0.15)' }
       }
     };
@@ -634,9 +725,9 @@ function renderChart(canvasId, type, itemData, title, bgColor, borderColor, isHo
   activeCharts[canvasId] = new Chart(ctx, {
     type: type,
     data: {
-      labels: type === 'radar' 
-        ? itemData.map(d => d.shortLabel || d.label) 
-        : itemData.map(d => d.label),
+      labels: type === 'radar'
+        ? itemData.map(d => d.shortLabel || d.label)
+        : (isHorizontalBar ? itemData.map(d => d.label) : itemData.map(d => wrapLabel2Lines(d.label))),
       datasets: [{
         label: title,
         data: itemData.map(d => d.nilai),

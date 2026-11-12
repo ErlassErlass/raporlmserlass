@@ -65,7 +65,7 @@ header.glass-header {
   width: 210mm;
   min-height: 296mm; /* Menggunakan min-height agar tidak menabrak limit pixel A4 jsPDF */
   background: #ffffff;
-  padding: 10mm 15mm; 
+  padding: 8mm 14mm; 
   color: #1a1a1a;
   box-sizing: border-box;
   position: relative;
@@ -124,11 +124,11 @@ header.glass-header {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 20px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px 20px;
+  gap: 6px 18px;
 }
 .bio-row { display: flex; font-size: 9pt; }
 .bio-label { 

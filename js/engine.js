@@ -58,6 +58,7 @@ class AssessmentEngine {
             email: email,
             program: program,
             scores: {},
+            completedQuizzes: 0,
             modulCounts: { IQ: 0, EQ: 0, SQ: 0, Minat: 0, Bakat: 0, Lingkungan: 0 },
             subtopics: this.initCanonicalSubtopics()
           };
@@ -70,7 +71,8 @@ class AssessmentEngine {
             nama_belakang: namaBelakang,
             nama_course: program,
             nama_kuis: q.nama_kuis,
-            nilai: q.nilai
+            nilai: q.nilai,
+            is_subdimension: !!q.is_subdimension
           });
         });
       } else if (item) {
@@ -89,9 +91,14 @@ class AssessmentEngine {
           email: email,
           program: row.nama_course || row['Course name'] || row['Nama Course'] || (this.rawData && this.rawData.course_name) || 'Profil Potensi & Karakter SD Kelas 4-6',
           scores: {},
+          completedQuizzes: 0,
           modulCounts: { IQ: 0, EQ: 0, SQ: 0, Minat: 0, Bakat: 0, Lingkungan: 0 },
           subtopics: this.initCanonicalSubtopics()
         };
+      }
+
+      if (!row.is_subdimension) {
+        studentMap[email].completedQuizzes++;
       }
 
       // Bersihkan nama kuis dari emoji & spasi ganda untuk pencocokan akurat
@@ -112,7 +119,9 @@ class AssessmentEngine {
             nilai: nilai,
             levelStatus: this.classifyScore(nilai)
           };
-          studentMap[email].modulCounts[mapping.modul]++;
+          if (!row.is_subdimension) {
+            studentMap[email].modulCounts[mapping.modul]++;
+          }
 
           // Update entri subtopik yang bersangkutan
           if (!studentMap[email].subtopics[mapping.modul]) {
@@ -122,6 +131,7 @@ class AssessmentEngine {
           if (existingItem) {
             existingItem.nilai = nilai;
             existingItem.attempted = true;
+            existingItem.isSubdimension = !!row.is_subdimension;
             existingItem.levelStatus = this.classifyScore(nilai);
           } else {
             studentMap[email].subtopics[mapping.modul].push({
@@ -129,6 +139,7 @@ class AssessmentEngine {
               label: mapping.label,
               nilai: nilai,
               attempted: true,
+              isSubdimension: !!row.is_subdimension,
               levelStatus: this.classifyScore(nilai)
             });
           }
@@ -149,10 +160,13 @@ class AssessmentEngine {
 
   processTop3() {
     this.students.forEach(student => {
-      // Sort Minat
+      // Sort Minat (utamakan domain minat spesifik daripada meta skor Preferensi/Kedalaman)
       if (student.subtopics['Minat']) {
-        // Buat salinan terurut untuk top 3
-        const sortedMinat = [...student.subtopics['Minat']].sort((a, b) => b.nilai - a.nilai);
+        const domainOnly = student.subtopics['Minat'].filter(
+          it => it.attempted && !['Minat.preferensi', 'Minat.kedalaman'].includes(it.key)
+        );
+        const minatPool = domainOnly.length > 0 ? domainOnly : student.subtopics['Minat'].filter(it => it.attempted);
+        const sortedMinat = [...minatPool].sort((a, b) => b.nilai - a.nilai);
         const top3Keys = new Set(sortedMinat.slice(0, 3).map(it => it.key));
         student.subtopics['Minat'].forEach(item => {
           item.isTop3 = top3Keys.has(item.key);
@@ -161,7 +175,8 @@ class AssessmentEngine {
 
       // Sort Bakat
       if (student.subtopics['Bakat']) {
-        const sortedBakat = [...student.subtopics['Bakat']].sort((a, b) => b.nilai - a.nilai);
+        const bakatPool = student.subtopics['Bakat'].filter(it => it.attempted);
+        const sortedBakat = [...bakatPool].sort((a, b) => b.nilai - a.nilai);
         const top3Keys = new Set(sortedBakat.slice(0, 3).map(it => it.key));
         student.subtopics['Bakat'].forEach(item => {
           item.isTop3 = top3Keys.has(item.key);
